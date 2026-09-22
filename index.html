@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +33,7 @@
         radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.1) 0%, transparent 40%);
     }
 
-    /* --- شاشة كلمة السر --- */
+    /* --- Ecran de Connexion --- */
     #login-screen {
       position: fixed;
       inset: 0;
@@ -74,7 +74,7 @@
       position: relative;
     }
 
-    input[type="password"], input[type="text"], textarea, select {
+    input[type="password"], input[type="text"], textarea, select, input[type="date"] {
       width: 100%;
       padding: 12px 16px;
       background: rgba(0, 0, 0, 0.4);
@@ -117,7 +117,7 @@
       display: none;
     }
 
-    /* --- الواجهة الرئيسية --- */
+    /* --- Interface Principale --- */
     header {
       padding: 20px 8%;
       display: flex;
@@ -177,7 +177,7 @@
       display: block;
     }
 
-    /* --- كروت الذكريات والصور --- */
+    /* --- Cartes & Formulaires --- */
     .add-form {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -246,7 +246,7 @@
     .delete-btn {
       position: absolute;
       top: 15px;
-      left: 15px;
+      right: 15px;
       background: rgba(255, 71, 87, 0.2);
       border: none;
       color: #ff4757;
@@ -256,7 +256,7 @@
       font-size: 0.8rem;
     }
 
-    /* --- قائمة الأهداف (Bucket List) --- */
+    /* --- Checklist --- */
     .checklist-item {
       display: flex;
       align-items: center;
@@ -291,69 +291,69 @@
   <div id="login-screen">
     <div class="login-box">
       <h2>SOULEFED & MEDOUD ✨</h2>
-      <p>أدخل كلمة السر الخاصة للوصول إلى مساحة الذكريات</p>
+      <p>Entrez le mot de passe pour accéder à votre espace privé</p>
       <div class="input-group">
-        <input type="password" id="pass-input" placeholder="كلمة السر...">
+        <input type="password" id="pass-input" placeholder="Mot de passe...">
       </div>
-      <button class="btn" onclick="checkPassword()">دخول 🔓</button>
-      <div id="error-msg" class="error-msg">كلمة السر غير صحيحة!</div>
+      <button class="btn" onclick="checkPassword()">Connexion 🔓</button>
+      <div id="error-msg" class="error-msg">Mot de passe incorrect!</div>
     </div>
   </div>
 
   <header>
     <div class="logo">SOULEFED & MEDOUD ❤️</div>
-    <button class="btn" style="width: auto; padding: 8px 16px; font-size: 0.85rem;" onclick="logout()">خروج 🔒</button>
+    <button class="btn" style="width: auto; padding: 8px 16px; font-size: 0.85rem;" onclick="logout()">Déconnexion 🔒</button>
   </header>
 
   <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('memories')">📖 الذكريات</button>
-    <button class="tab-btn" onclick="switchTab('gallery')">🖼️ الصور</button>
-    <button class="tab-btn" onclick="switchTab('notes')">💌 الرسائل</button>
-    <button class="tab-btn" onclick="switchTab('bucket')">✨ أهدافنا</button>
+    <button class="tab-btn active" onclick="switchTab('memories', event)">📖 Souvenirs</button>
+    <button class="tab-btn" onclick="switchTab('gallery', event)">🖼️ Photos</button>
+    <button class="tab-btn" onclick="switchTab('notes', event)">💌 Messages</button>
+    <button class="tab-btn" onclick="switchTab('bucket', event)">✨ Nos Objectifs</button>
   </div>
 
   <main>
     <div id="memories-tab" class="tab-content active">
       <div class="add-form">
-        <h3>إضافة ذكرى جديدة</h3>
+        <h3>Ajouter un nouveau souvenir</h3>
         <div class="form-grid">
-          <input type="text" id="mem-title" placeholder="عنوان الذكرى">
+          <input type="text" id="mem-title" placeholder="Titre du souvenir">
           <input type="date" id="mem-date">
         </div>
-        <textarea id="mem-desc" rows="3" placeholder="اكتب تفاصيل الذكرى هنا..."></textarea>
-        <button class="btn" style="margin-top: 12px;" onclick="addMemory()">حفظ الذكرى 💾</button>
+        <textarea id="mem-desc" rows="3" placeholder="Écrivez les détails ici..."></textarea>
+        <button class="btn" style="margin-top: 12px;" onclick="addMemory()">Enregistrer 💾</button>
       </div>
       <div id="memories-grid" class="grid-cards"></div>
     </div>
 
     <div id="gallery-tab" class="tab-content">
       <div class="add-form">
-        <h3>إضافة صورة للذكرى</h3>
+        <h3>Ajouter une photo</h3>
         <div class="form-grid">
-          <input type="text" id="img-url" placeholder="رابط الصورة (Image URL)">
-          <input type="text" id="img-caption" placeholder="وصف الصورة">
+          <input type="text" id="img-url" placeholder="Lien de l'image (URL)">
+          <input type="text" id="img-caption" placeholder="Description de la photo">
         </div>
-        <button class="btn" onclick="addImage()">إضافة الصورة 📷</button>
+        <button class="btn" onclick="addImage()">Ajouter Photo 📷</button>
       </div>
       <div id="gallery-grid" class="grid-cards"></div>
     </div>
 
     <div id="notes-tab" class="tab-content">
       <div class="add-form">
-        <h3>كتابة رسالة خاصة</h3>
-        <input type="text" id="note-sender" placeholder="اسم الكاتب (Mohamed أو Soulefed)" style="margin-bottom: 12px;">
-        <textarea id="note-text" rows="3" placeholder="اكتب رسالتك هنا..."></textarea>
-        <button class="btn" style="margin-top: 12px;" onclick="addNote()">إرسال الرسالة 💌</button>
+        <h3>Écrire un message privé</h3>
+        <input type="text" id="note-sender" placeholder="De la part de (Mohamed / Soulefed)" style="margin-bottom: 12px;">
+        <textarea id="note-text" rows="3" placeholder="Votre message..."></textarea>
+        <button class="btn" style="margin-top: 12px;" onclick="addNote()">Envoyer 💌</button>
       </div>
       <div id="notes-grid" class="grid-cards"></div>
     </div>
 
     <div id="bucket-tab" class="tab-content">
       <div class="add-form">
-        <h3>إضافة هدف مشترك</h3>
+        <h3>Ajouter un objectif commun</h3>
         <div style="display: flex; gap: 10px;">
-          <input type="text" id="bucket-text" placeholder="شيء نتمنى القيام به سوياً...">
-          <button class="btn" style="width: 150px;" onclick="addBucket()">إضافة ✨</button>
+          <input type="text" id="bucket-text" placeholder="Chose à faire ensemble...">
+          <button class="btn" style="width: 150px;" onclick="addBucket()">Ajouter ✨</button>
         </div>
       </div>
       <div id="bucket-list"></div>
@@ -363,7 +363,6 @@
   <script>
     const SECRET_PASS = "SOULEFED&MEDOUD";
 
-    // التحقق من الجلسة
     window.onload = function() {
       if (localStorage.getItem('isLoggedIn') === 'true') {
         document.getElementById('login-screen').style.display = 'none';
@@ -387,7 +386,7 @@
       location.reload();
     }
 
-    function switchTab(tabName) {
+    function switchTab(tabName, event) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
       
@@ -395,7 +394,6 @@
       document.getElementById(tabName + '-tab').classList.add('active');
     }
 
-    // إدارة البيانات (LocalStorage)
     function getData(key) { return JSON.parse(localStorage.getItem(key) || '[]'); }
     function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
 
@@ -406,13 +404,13 @@
       renderBucket();
     }
 
-    // الذكريات
+    /* Souvenirs */
     function addMemory() {
       const title = document.getElementById('mem-title').value;
       const date = document.getElementById('mem-date').value;
       const desc = document.getElementById('mem-desc').value;
 
-      if (!title || !desc) return alert('يرجى ملء جميع الحقول');
+      if (!title || !desc) return alert('Veuillez remplir les champs');
 
       const items = getData('memories');
       items.push({ id: Date.now(), title, date, desc });
@@ -428,20 +426,20 @@
       const grid = document.getElementById('memories-grid');
       grid.innerHTML = items.map(item => `
         <div class="card">
-          <button class="delete-btn" onclick="deleteItem('memories', ${item.id})">حذف</button>
+          <button class="delete-btn" onclick="deleteItem('memories', ${item.id})">Supprimer</button>
           <div class="card-title">${item.title}</div>
-          <div class="card-date">${item.date || 'بدون تاريخ'}</div>
+          <div class="card-date">${item.date || 'Sans date'}</div>
           <div class="card-desc">${item.desc}</div>
         </div>
       `).join('');
     }
 
-    // الصور
+    /* Photos */
     function addImage() {
       const url = document.getElementById('img-url').value;
       const caption = document.getElementById('img-caption').value;
 
-      if (!url) return alert('يرجى إدخال رابط الصورة');
+      if (!url) return alert('Veuillez entrer un lien');
 
       const items = getData('gallery');
       items.push({ id: Date.now(), url, caption });
@@ -457,22 +455,24 @@
       const grid = document.getElementById('gallery-grid');
       grid.innerHTML = items.map(item => `
         <div class="card">
-          <button class="delete-btn" onclick="deleteItem('gallery', ${item.id})">حذف</button>
-          <img src="${item.url}" alt="ذكرى">
+          <button class="delete-btn" onclick="deleteItem('gallery', ${item.id})">Supprimer</button>
+          <img src="${item.url}" alt="Souvenir">
           <div class="card-desc" style="text-align: center;">${item.caption}</div>
         </div>
       `).join('');
     }
 
-    // الرسائل
+    /* Messages */
     function addNote() {
       const sender = document.getElementById('note-sender').value;
       const text = document.getElementById('note-text').value;
 
-      if (!sender || !text) return alert('يرجى كتابة الاسم والرسالة');
+      if (!sender || !text) return alert('Veuillez remplir tous les champs');
 
       const items = getData('notes');
-      items.push({ id: Date.now(), sender, text, date: new Date().toLocaleDateString('ar-EG') });
+      // Format de date en français (ex: 23/09/2026)
+      const formattedDate = new Date().toLocaleDateString('fr-FR');
+      items.push({ id: Date.now(), sender, text, date: formattedDate });
       saveData('notes', items);
 
       document.getElementById('note-text').value = '';
@@ -484,15 +484,15 @@
       const grid = document.getElementById('notes-grid');
       grid.innerHTML = items.map(item => `
         <div class="card">
-          <button class="delete-btn" onclick="deleteItem('notes', ${item.id})">حذف</button>
-          <div class="card-title">من: ${item.sender}</div>
+          <button class="delete-btn" onclick="deleteItem('notes', ${item.id})">Supprimer</button>
+          <div class="card-title">De: ${item.sender}</div>
           <div class="card-date">${item.date}</div>
           <div class="card-desc">"${item.text}"</div>
         </div>
       `).join('');
     }
 
-    // الأهداف
+    /* Objectifs */
     function addBucket() {
       const text = document.getElementById('bucket-text').value;
       if (!text) return;
@@ -520,7 +520,7 @@
         <div class="checklist-item ${item.done ? 'done' : ''}">
           <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleBucket(${item.id})">
           <span style="flex:1;">${item.text}</span>
-          <button class="delete-btn" style="position:static;" onclick="deleteItem('bucket', ${item.id})">حذف</button>
+          <button class="delete-btn" style="position:static;" onclick="deleteItem('bucket', ${item.id})">Supprimer</button>
         </div>
       `).join('');
     }
