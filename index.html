@@ -17,6 +17,8 @@
       --accent-color: #00f2fe;
       --text-color: #f1f5f9;
       --border-color: rgba(255, 46, 147, 0.25);
+      --chat-my-msg: linear-gradient(135deg, #ff2e93, #ff65a3);
+      --chat-other-msg: #231638;
     }
 
     * {
@@ -73,7 +75,7 @@
       margin-bottom: 25px;
     }
 
-    input[type="password"], input[type="text"], textarea, input[type="date"], input[type="file"] {
+    input[type="password"], input[type="text"], textarea, input[type="date"], input[type="file"], select {
       width: 100%;
       padding: 12px 16px;
       background: rgba(0, 0, 0, 0.4);
@@ -85,7 +87,7 @@
       transition: all 0.3s;
     }
 
-    input:focus, textarea:focus {
+    input:focus, textarea:focus, select:focus {
       border-color: var(--primary-color);
       box-shadow: 0 0 12px rgba(255, 46, 147, 0.3);
     }
@@ -267,6 +269,176 @@
       text-decoration: line-through;
     }
 
+    /* ----------- Chat Instagram UI Style ----------- */
+    .chat-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      height: 70vh;
+      max-height: 750px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .chat-header {
+      padding: 15px 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-user-select {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-user-select label {
+      font-size: 0.9rem;
+      color: var(--accent-color);
+      font-weight: bold;
+    }
+
+    .chat-user-select select {
+      width: auto;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-bubble-wrapper {
+      display: flex;
+      flex-direction: column;
+      max-width: 75%;
+    }
+
+    .chat-bubble-wrapper.mine {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+
+    .chat-bubble-wrapper.other {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .chat-author {
+      font-size: 0.75rem;
+      color: #aaa;
+      margin-bottom: 3px;
+      padding: 0 5px;
+    }
+
+    .chat-bubble {
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      word-break: break-word;
+      position: relative;
+    }
+
+    .chat-bubble-wrapper.mine .chat-bubble {
+      background: var(--chat-my-msg);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 15px rgba(255, 46, 147, 0.3);
+    }
+
+    .chat-bubble-wrapper.other .chat-bubble {
+      background: var(--chat-other-msg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-time {
+      font-size: 0.68rem;
+      opacity: 0.7;
+      margin-top: 4px;
+      display: block;
+      text-align: right;
+    }
+
+    .typing-indicator {
+      font-size: 0.85rem;
+      color: var(--accent-color);
+      font-style: italic;
+      padding: 5px 20px;
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .typing-dots span {
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      background-color: var(--accent-color);
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(1) { animation-delay: 0s; }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing {
+      0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    .chat-input-area {
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.4);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .chat-input-area textarea {
+      resize: none;
+      height: 48px;
+      border-radius: 24px;
+      padding: 12px 18px;
+    }
+
+    .chat-send-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      border: none;
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(255, 46, 147, 0.5);
+      transition: transform 0.2s;
+    }
+
+    .chat-send-btn:hover {
+      transform: scale(1.05);
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -283,7 +455,7 @@
       <div class="input-group">
         <input type="password" id="pass-input" placeholder="Mot de passe...">
       </div>
-      <button class="btn" onclick="checkPassword()">Connexion 🔓</button>
+      <button class="btn" onclick="checkPassword()" style="margin-top: 15px;">Connexion 🔓</button>
       <div id="error-msg" class="error-msg">Mot de passe incorrect!</div>
     </div>
   </div>
@@ -328,15 +500,29 @@
       <div id="gallery-grid" class="grid-cards"></div>
     </div>
 
-    <!-- Messages -->
+    <!-- Messages / Chat style Instagram -->
     <div id="notes-tab" class="tab-content">
-      <div class="add-form">
-        <h3>Écrire un message privé</h3>
-        <input type="text" id="note-sender" placeholder="De la part de (Mohamed / Soulefed)" style="margin-bottom: 12px;">
-        <textarea id="note-text" rows="3" placeholder="Votre message..."></textarea>
-        <button class="btn" style="margin-top: 12px;" onclick="addNote()">Envoyer 💌</button>
+      <div class="chat-container">
+        <div class="chat-header">
+          <div class="chat-user-select">
+            <label for="current-user">Je suis :</label>
+            <select id="current-user" onchange="onUserChange()">
+              <option value="Mohamed">Mohamed ♂️</option>
+              <option value="Soulefed">Soulefed ♀️</option>
+            </select>
+          </div>
+          <span style="font-size: 0.85rem; color: #888;">Chat en direct ✨</span>
+        </div>
+
+        <div id="chat-messages" class="chat-messages"></div>
+
+        <div id="typing-status" class="typing-indicator"></div>
+
+        <div class="chat-input-area">
+          <textarea id="chat-input" placeholder="Écrivez un message..." oninput="handleTyping()" onkeydown="handleKeyDown(event)"></textarea>
+          <button class="chat-send-btn" onclick="sendChatMessage()">➔</button>
+        </div>
       </div>
-      <div id="notes-grid" class="grid-cards"></div>
     </div>
 
     <!-- Objectifs -->
@@ -369,10 +555,18 @@
     const db = firebase.database();
 
     const SECRET_PASS = "SOULEFED&MEDOUD";
+    let typingTimeout = null;
 
     window.onload = function() {
       if (localStorage.getItem('isLoggedIn') === 'true') {
         document.getElementById('login-screen').style.display = 'none';
+        
+        // استرجاع المستخدم المفضل أو تعيينه
+        const savedUser = localStorage.getItem('chat_user');
+        if (savedUser) {
+          document.getElementById('current-user').value = savedUser;
+        }
+
         listenToData();
       }
     };
@@ -399,6 +593,16 @@
       
       event.target.classList.add('active');
       document.getElementById(tabName + '-tab').classList.add('active');
+
+      if (tabName === 'notes') {
+        scrollToBottom();
+      }
+    }
+
+    function onUserChange() {
+      const selectedUser = document.getElementById('current-user').value;
+      localStorage.setItem('chat_user', selectedUser);
+      listenToData();
     }
 
     function listenToData() {
@@ -412,9 +616,36 @@
         renderGallery(Object.entries(data).map(([id, val]) => ({ id, ...val })));
       });
 
+      // استماع الرسائل
       db.ref('notes').on('value', snapshot => {
         const data = snapshot.val() || {};
-        renderNotes(Object.entries(data).map(([id, val]) => ({ id, ...val })));
+        renderChatMessages(Object.entries(data).map(([id, val]) => ({ id, ...val })));
+      });
+
+      // استماع حالة الكتابة
+      db.ref('typing').on('value', snapshot => {
+        const typingData = snapshot.val() || {};
+        const currentUser = document.getElementById('current-user').value;
+        const typingIndicator = document.getElementById('typing-status');
+
+        let isOtherTyping = false;
+        let typingUser = '';
+
+        Object.keys(typingData).forEach(user => {
+          if (user !== currentUser && typingData[user] === true) {
+            isOtherTyping = true;
+            typingUser = user;
+          }
+        });
+
+        if (isOtherTyping) {
+          typingIndicator.innerHTML = `
+            <span>${typingUser} est en train d'écrire</span>
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+          `;
+        } else {
+          typingIndicator.innerHTML = '';
+        }
       });
 
       db.ref('bucket').on('value', snapshot => {
@@ -478,28 +709,79 @@
       `).join('');
     }
 
-    /* Messages */
-    function addNote() {
-      const sender = document.getElementById('note-sender').value;
-      const text = document.getElementById('note-text').value;
+    /* Messages / Chat Instagram Style */
+    function handleTyping() {
+      const currentUser = document.getElementById('current-user').value;
+      db.ref(`typing/${currentUser}`).set(true);
 
-      if (!sender || !text) return alert('Veuillez remplir tous les champs');
-
-      const formattedDate = new Date().toLocaleDateString('fr-FR');
-      db.ref('notes').push({ sender, text, date: formattedDate });
-      document.getElementById('note-text').value = '';
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        db.ref(`typing/${currentUser}`).set(false);
+      }, 2000);
     }
 
-    function renderNotes(items) {
-      const grid = document.getElementById('notes-grid');
-      grid.innerHTML = items.map(item => `
-        <div class="card">
-          <button class="delete-btn" onclick="deleteItem('notes', '${item.id}')">Supprimer</button>
-          <div class="card-title">De: ${item.sender}</div>
-          <div class="card-date">${item.date}</div>
-          <div class="card-desc">"${item.text}"</div>
-        </div>
-      `).join('');
+    function handleKeyDown(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChatMessage();
+      }
+    }
+
+    function sendChatMessage() {
+      const currentUser = document.getElementById('current-user').value;
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+
+      if (!text) return;
+
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+      db.ref('notes').push({
+        sender: currentUser,
+        text: text,
+        time: timeStr,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+      });
+
+      db.ref(`typing/${currentUser}`).set(false);
+      input.value = '';
+    }
+
+    function renderChatMessages(items) {
+      const currentUser = document.getElementById('current-user').value;
+      const chatContainer = document.getElementById('chat-messages');
+
+      // ترتيب حسب الوقت
+      items.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+      chatContainer.innerHTML = items.map(item => {
+        const isMine = item.sender === currentUser;
+        return `
+          <div class="chat-bubble-wrapper ${isMine ? 'mine' : 'other'}">
+            <span class="chat-author">${isMine ? 'Vous' : item.sender}</span>
+            <div class="chat-bubble">
+              ${escapeHtml(item.text)}
+              <span class="chat-time">${item.time || ''}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      scrollToBottom();
+    }
+
+    function scrollToBottom() {
+      const chatContainer = document.getElementById('chat-messages');
+      setTimeout(() => {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }, 50);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
     }
 
     /* Objectifs */
