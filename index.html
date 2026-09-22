@@ -18,7 +18,7 @@
       --text-color: #f1f5f9;
       --border-color: rgba(255, 46, 147, 0.25);
       --chat-my-msg: linear-gradient(135deg, #ff2e93, #ff65a3);
-      --chat-other-msg: #231638;
+      --chat-other-msg: #201335;
     }
 
     * {
@@ -269,44 +269,52 @@
       text-decoration: line-through;
     }
 
-    /* ----------- Chat Instagram UI Style ----------- */
+    /* ----------- Chat Instagram & Vocal UI Style ----------- */
     .chat-container {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 20px;
       display: flex;
       flex-direction: column;
-      height: 70vh;
-      max-height: 750px;
+      height: 75vh;
+      max-height: 800px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
 
     .chat-header {
       padding: 15px 20px;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.5);
       border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .chat-user-select {
+    .chat-user-badge {
       display: flex;
       align-items: center;
       gap: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
     }
 
-    .chat-user-select label {
+    .chat-user-badge label {
       font-size: 0.9rem;
       color: var(--accent-color);
       font-weight: bold;
     }
 
-    .chat-user-select select {
+    .chat-user-badge select {
       width: auto;
-      padding: 6px 12px;
-      font-size: 0.9rem;
+      padding: 4px 10px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      background: #170e26;
+      border-radius: 8px;
     }
 
     .chat-messages {
@@ -315,14 +323,14 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
       scroll-behavior: smooth;
     }
 
     .chat-bubble-wrapper {
       display: flex;
       flex-direction: column;
-      max-width: 75%;
+      max-width: 80%;
     }
 
     .chat-bubble-wrapper.mine {
@@ -336,16 +344,24 @@
     }
 
     .chat-author {
-      font-size: 0.75rem;
-      color: #aaa;
-      margin-bottom: 3px;
-      padding: 0 5px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-bottom: 4px;
+      padding: 0 6px;
+    }
+
+    .chat-bubble-wrapper.mine .chat-author {
+      color: var(--accent-color);
+    }
+
+    .chat-bubble-wrapper.other .chat-author {
+      color: var(--primary-color);
     }
 
     .chat-bubble {
-      padding: 12px 16px;
-      border-radius: 18px;
-      font-size: 0.95rem;
+      padding: 12px 18px;
+      border-radius: 20px;
+      font-size: 0.98rem;
       line-height: 1.4;
       word-break: break-word;
       position: relative;
@@ -367,10 +383,17 @@
 
     .chat-time {
       font-size: 0.68rem;
-      opacity: 0.7;
-      margin-top: 4px;
+      opacity: 0.75;
+      margin-top: 5px;
       display: block;
       text-align: right;
+    }
+
+    audio {
+      max-width: 240px;
+      height: 40px;
+      margin-top: 5px;
+      outline: none;
     }
 
     .typing-indicator {
@@ -404,7 +427,7 @@
 
     .chat-input-area {
       padding: 15px;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.5);
       border-top: 1px solid var(--border-color);
       display: flex;
       gap: 10px;
@@ -418,11 +441,10 @@
       padding: 12px 18px;
     }
 
-    .chat-send-btn {
-      width: 48px;
-      height: 48px;
+    .chat-btn-icon {
+      width: 46px;
+      height: 46px;
       border-radius: 50%;
-      background: var(--primary-color);
       border: none;
       color: #fff;
       font-size: 1.2rem;
@@ -431,12 +453,35 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      box-shadow: 0 0 12px rgba(255, 46, 147, 0.5);
-      transition: transform 0.2s;
+      transition: transform 0.2s, background 0.3s;
     }
 
-    .chat-send-btn:hover {
-      transform: scale(1.05);
+    .vocal-btn {
+      background: rgba(0, 242, 254, 0.2);
+      border: 1px solid var(--accent-color);
+      color: var(--accent-color);
+    }
+
+    .vocal-btn.recording {
+      background: #ff4757;
+      border-color: #ff4757;
+      color: #fff;
+      animation: pulse 1s infinite;
+    }
+
+    .send-btn {
+      background: var(--primary-color);
+      box-shadow: 0 0 12px rgba(255, 46, 147, 0.5);
+    }
+
+    .chat-btn-icon:hover {
+      transform: scale(1.08);
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
     }
 
     @keyframes fadeIn {
@@ -500,18 +545,18 @@
       <div id="gallery-grid" class="grid-cards"></div>
     </div>
 
-    <!-- Messages / Chat style Instagram -->
+    <!-- Messages / Chat style Instagram & Vocal -->
     <div id="notes-tab" class="tab-content">
       <div class="chat-container">
         <div class="chat-header">
-          <div class="chat-user-select">
-            <label for="current-user">Je suis :</label>
+          <div class="chat-user-badge">
+            <label for="current-user">Mon profil :</label>
             <select id="current-user" onchange="onUserChange()">
               <option value="Mohamed">Mohamed ♂️</option>
               <option value="Soulefed">Soulefed ♀️</option>
             </select>
           </div>
-          <span style="font-size: 0.85rem; color: #888;">Chat en direct ✨</span>
+          <span style="font-size: 0.85rem; color: var(--accent-color); font-weight: bold;">En direct ✨</span>
         </div>
 
         <div id="chat-messages" class="chat-messages"></div>
@@ -519,8 +564,9 @@
         <div id="typing-status" class="typing-indicator"></div>
 
         <div class="chat-input-area">
+          <button id="vocal-btn" class="chat-btn-icon vocal-btn" onclick="toggleRecording()" title="Enregistrer un vocal">🎙️</button>
           <textarea id="chat-input" placeholder="Écrivez un message..." oninput="handleTyping()" onkeydown="handleKeyDown(event)"></textarea>
-          <button class="chat-send-btn" onclick="sendChatMessage()">➔</button>
+          <button class="chat-btn-icon send-btn" onclick="sendChatMessage()">➔</button>
         </div>
       </div>
     </div>
@@ -557,11 +603,15 @@
     const SECRET_PASS = "SOULEFED&MEDOUD";
     let typingTimeout = null;
 
+    // متغیرات التسجيل الصوتي
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+
     window.onload = function() {
       if (localStorage.getItem('isLoggedIn') === 'true') {
         document.getElementById('login-screen').style.display = 'none';
         
-        // استرجاع المستخدم المفضل أو تعيينه
         const savedUser = localStorage.getItem('chat_user');
         if (savedUser) {
           document.getElementById('current-user').value = savedUser;
@@ -616,13 +666,11 @@
         renderGallery(Object.entries(data).map(([id, val]) => ({ id, ...val })));
       });
 
-      // استماع الرسائل
       db.ref('notes').on('value', snapshot => {
         const data = snapshot.val() || {};
         renderChatMessages(Object.entries(data).map(([id, val]) => ({ id, ...val })));
       });
 
-      // استماع حالة الكتابة
       db.ref('typing').on('value', snapshot => {
         const typingData = snapshot.val() || {};
         const currentUser = document.getElementById('current-user').value;
@@ -709,7 +757,7 @@
       `).join('');
     }
 
-    /* Messages / Chat Instagram Style */
+    /* Messages / Chat & Vocal */
     function handleTyping() {
       const currentUser = document.getElementById('current-user').value;
       db.ref(`typing/${currentUser}`).set(true);
@@ -740,6 +788,7 @@
       db.ref('notes').push({
         sender: currentUser,
         text: text,
+        type: 'text',
         time: timeStr,
         timestamp: firebase.database.ServerValue.TIMESTAMP
       });
@@ -748,20 +797,77 @@
       input.value = '';
     }
 
+    /* التسجيل الصوتي (Vocal) */
+    async function toggleRecording() {
+      const btn = document.getElementById('vocal-btn');
+
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+          };
+
+          mediaRecorder.onstop = async () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const reader = new FileReader();
+            reader.readAsDataURL(audioBlob);
+            reader.onloadend = () => {
+              const base64Audio = reader.result;
+              const currentUser = document.getElementById('current-user').value;
+              const now = new Date();
+              const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+              db.ref('notes').push({
+                sender: currentUser,
+                audio: base64Audio,
+                type: 'audio',
+                time: timeStr,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+              });
+            };
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          btn.classList.add('recording');
+          btn.innerText = '⏹️';
+        } catch (err) {
+          alert("Impossible d'accéder au micro : " + err.message);
+        }
+      } else {
+        mediaRecorder.stop();
+        isRecording = false;
+        btn.classList.remove('recording');
+        btn.innerText = '🎙️';
+      }
+    }
+
     function renderChatMessages(items) {
       const currentUser = document.getElementById('current-user').value;
       const chatContainer = document.getElementById('chat-messages');
 
-      // ترتيب حسب الوقت
       items.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
       chatContainer.innerHTML = items.map(item => {
         const isMine = item.sender === currentUser;
+        const authorLabel = isMine ? `${item.sender} (Vous)` : item.sender;
+
+        let content = '';
+        if (item.type === 'audio' || item.audio) {
+          content = `<audio controls src="${item.audio}"></audio>`;
+        } else {
+          content = escapeHtml(item.text || '');
+        }
+
         return `
           <div class="chat-bubble-wrapper ${isMine ? 'mine' : 'other'}">
-            <span class="chat-author">${isMine ? 'Vous' : item.sender}</span>
+            <span class="chat-author">${authorLabel}</span>
             <div class="chat-bubble">
-              ${escapeHtml(item.text)}
+              ${content}
               <span class="chat-time">${item.time || ''}</span>
             </div>
           </div>
