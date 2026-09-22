@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SOULEFED & MEDOUD | Notre Espace Privé ✨</title>
+  
+  <!-- Firebase SDKs (Compat v9) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
   <style>
     :root {
       --bg-color: #0d0714;
@@ -33,7 +38,6 @@
         radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.1) 0%, transparent 40%);
     }
 
-    /* Login Screen */
     #login-screen {
       position: fixed;
       inset: 0;
@@ -79,10 +83,6 @@
       font-size: 1rem;
       outline: none;
       transition: all 0.3s;
-    }
-
-    input[type="file"] {
-      cursor: pointer;
     }
 
     input:focus, textarea:focus {
@@ -210,11 +210,6 @@
       transition: transform 0.3s;
     }
 
-    .card:hover {
-      transform: translateY(-5px);
-    }
-
-    /* تعديل حجم الصورة لتصبح واسعة وطبيعية */
     .card img {
       width: 100%;
       height: auto;
@@ -280,6 +275,7 @@
 </head>
 <body>
 
+  <!-- Écran de verrouillage -->
   <div id="login-screen">
     <div class="login-box">
       <h2>SOULEFED & MEDOUD ✨</h2>
@@ -305,6 +301,7 @@
   </div>
 
   <main>
+    <!-- Souvenirs -->
     <div id="memories-tab" class="tab-content active">
       <div class="add-form">
         <h3>Ajouter un nouveau souvenir</h3>
@@ -318,6 +315,7 @@
       <div id="memories-grid" class="grid-cards"></div>
     </div>
 
+    <!-- Photos -->
     <div id="gallery-tab" class="tab-content">
       <div class="add-form">
         <h3>Ajouter une photo depuis votre appareil 📱💻</h3>
@@ -330,6 +328,7 @@
       <div id="gallery-grid" class="grid-cards"></div>
     </div>
 
+    <!-- Messages -->
     <div id="notes-tab" class="tab-content">
       <div class="add-form">
         <h3>Écrire un message privé</h3>
@@ -340,6 +339,7 @@
       <div id="notes-grid" class="grid-cards"></div>
     </div>
 
+    <!-- Objectifs -->
     <div id="bucket-tab" class="tab-content">
       <div class="add-form">
         <h3>Ajouter un objectif commun</h3>
@@ -353,12 +353,27 @@
   </main>
 
   <script>
+    // مفاتيح مشروعك المدمجة
+    const firebaseConfig = {
+      apiKey: "AIzaSyDeyfQGykcAxJX_75tQFB8N6sGrRjgTRLI",
+      authDomain: "ourspace-f0378.firebaseapp.com",
+      databaseURL: "https://ourspace-f0378-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "ourspace-f0378",
+      storageBucket: "ourspace-f0378.firebasestorage.app",
+      messagingSenderId: "996661499365",
+      appId: "1:996661499365:web:c35676b1d16ae900e48b0c",
+      measurementId: "G-1BM636JWTY"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     const SECRET_PASS = "SOULEFED&MEDOUD";
 
     window.onload = function() {
       if (localStorage.getItem('isLoggedIn') === 'true') {
         document.getElementById('login-screen').style.display = 'none';
-        loadData();
+        listenToData();
       }
     };
 
@@ -367,7 +382,7 @@
       if (input === SECRET_PASS) {
         localStorage.setItem('isLoggedIn', 'true');
         document.getElementById('login-screen').style.display = 'none';
-        loadData();
+        listenToData();
       } else {
         document.getElementById('error-msg').style.display = 'block';
       }
@@ -386,14 +401,26 @@
       document.getElementById(tabName + '-tab').classList.add('active');
     }
 
-    function getData(key) { return JSON.parse(localStorage.getItem(key) || '[]'); }
-    function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+    function listenToData() {
+      db.ref('memories').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        renderMemories(Object.entries(data).map(([id, val]) => ({ id, ...val })));
+      });
 
-    function loadData() {
-      renderMemories();
-      renderGallery();
-      renderNotes();
-      renderBucket();
+      db.ref('gallery').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        renderGallery(Object.entries(data).map(([id, val]) => ({ id, ...val })));
+      });
+
+      db.ref('notes').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        renderNotes(Object.entries(data).map(([id, val]) => ({ id, ...val })));
+      });
+
+      db.ref('bucket').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        renderBucket(Object.entries(data).map(([id, val]) => ({ id, ...val })));
+      });
     }
 
     /* Souvenirs */
@@ -404,21 +431,16 @@
 
       if (!title || !desc) return alert('Veuillez remplir les champs');
 
-      const items = getData('memories');
-      items.push({ id: Date.now(), title, date, desc });
-      saveData('memories', items);
-      
+      db.ref('memories').push({ title, date, desc });
       document.getElementById('mem-title').value = '';
       document.getElementById('mem-desc').value = '';
-      renderMemories();
     }
 
-    function renderMemories() {
-      const items = getData('memories');
+    function renderMemories(items) {
       const grid = document.getElementById('memories-grid');
       grid.innerHTML = items.map(item => `
         <div class="card">
-          <button class="delete-btn" onclick="deleteItem('memories', ${item.id})">Supprimer</button>
+          <button class="delete-btn" onclick="deleteItem('memories', '${item.id}')">Supprimer</button>
           <div class="card-title">${item.title}</div>
           <div class="card-date">${item.date || 'Sans date'}</div>
           <div class="card-desc">${item.desc}</div>
@@ -426,42 +448,30 @@
       `).join('');
     }
 
-    /* Upload Photo */
+    /* Photos */
     function uploadImage() {
       const fileInput = document.getElementById('img-file');
       const caption = document.getElementById('img-caption').value;
 
-      if (fileInput.files.length === 0) {
-        return alert('Veuillez sélectionner une photo depuis votre galerie');
-      }
+      if (fileInput.files.length === 0) return alert('Veuillez sélectionner une photo');
 
       const file = fileInput.files[0];
       const reader = new FileReader();
 
       reader.onload = function(e) {
-        const base64Image = e.target.result;
-        const items = getData('gallery');
-        items.push({ id: Date.now(), url: base64Image, caption: caption });
-        
-        try {
-          saveData('gallery', items);
-          fileInput.value = '';
-          document.getElementById('img-caption').value = '';
-          renderGallery();
-        } catch (err) {
-          alert('Taille d\'image trop grande! Choisissez une image plus petite.');
-        }
+        db.ref('gallery').push({ url: e.target.result, caption: caption });
+        fileInput.value = '';
+        document.getElementById('img-caption').value = '';
       };
 
       reader.readAsDataURL(file);
     }
 
-    function renderGallery() {
-      const items = getData('gallery');
+    function renderGallery(items) {
       const grid = document.getElementById('gallery-grid');
       grid.innerHTML = items.map(item => `
         <div class="card">
-          <button class="delete-btn" onclick="deleteItem('gallery', ${item.id})">Supprimer</button>
+          <button class="delete-btn" onclick="deleteItem('gallery', '${item.id}')">Supprimer</button>
           <img src="${item.url}" alt="Photo">
           <div class="card-desc" style="text-align: center;">${item.caption}</div>
         </div>
@@ -475,21 +485,16 @@
 
       if (!sender || !text) return alert('Veuillez remplir tous les champs');
 
-      const items = getData('notes');
       const formattedDate = new Date().toLocaleDateString('fr-FR');
-      items.push({ id: Date.now(), sender, text, date: formattedDate });
-      saveData('notes', items);
-
+      db.ref('notes').push({ sender, text, date: formattedDate });
       document.getElementById('note-text').value = '';
-      renderNotes();
     }
 
-    function renderNotes() {
-      const items = getData('notes');
+    function renderNotes(items) {
       const grid = document.getElementById('notes-grid');
       grid.innerHTML = items.map(item => `
         <div class="card">
-          <button class="delete-btn" onclick="deleteItem('notes', ${item.id})">Supprimer</button>
+          <button class="delete-btn" onclick="deleteItem('notes', '${item.id}')">Supprimer</button>
           <div class="card-title">De: ${item.sender}</div>
           <div class="card-date">${item.date}</div>
           <div class="card-desc">"${item.text}"</div>
@@ -502,39 +507,27 @@
       const text = document.getElementById('bucket-text').value;
       if (!text) return;
 
-      const items = getData('bucket');
-      items.push({ id: Date.now(), text, done: false });
-      saveData('bucket', items);
-
+      db.ref('bucket').push({ text, done: false });
       document.getElementById('bucket-text').value = '';
-      renderBucket();
     }
 
-    function toggleBucket(id) {
-      const items = getData('bucket');
-      const item = items.find(i => i.id === id);
-      if (item) item.done = !item.done;
-      saveData('bucket', items);
-      renderBucket();
+    function toggleBucket(id, currentStatus) {
+      db.ref(`bucket/${id}`).update({ done: !currentStatus });
     }
 
-    function renderBucket() {
-      const items = getData('bucket');
+    function renderBucket(items) {
       const list = document.getElementById('bucket-list');
       list.innerHTML = items.map(item => `
         <div class="checklist-item ${item.done ? 'done' : ''}">
-          <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleBucket(${item.id})">
+          <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleBucket('${item.id}', ${item.done})">
           <span style="flex:1;">${item.text}</span>
-          <button class="delete-btn" style="position:static;" onclick="deleteItem('bucket', ${item.id})">Supprimer</button>
+          <button class="delete-btn" style="position:static;" onclick="deleteItem('bucket', '${item.id}')">Supprimer</button>
         </div>
       `).join('');
     }
 
-    function deleteItem(storageKey, id) {
-      let items = getData(storageKey);
-      items = items.filter(i => i.id !== id);
-      saveData(storageKey, items);
-      loadData();
+    function deleteItem(path, id) {
+      db.ref(`${path}/${id}`).remove();
     }
   </script>
 </body>
