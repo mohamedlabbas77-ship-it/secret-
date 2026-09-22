@@ -585,7 +585,6 @@
   </main>
 
   <script>
-    // مفاتيح مشروعك المدمجة والرابط الصحيح لقاعدة البيانات
     const firebaseConfig = {
       apiKey: "AIzaSyDeyfQGykcAxJX_75tQFB8N6sGrRjgTRLI",
       authDomain: "ourspace-f0378.firebaseapp.com",
@@ -603,7 +602,6 @@
     const SECRET_PASS = "SOULEFED&MEDOUD";
     let typingTimeout = null;
 
-    // متغیرات التسجيل الصوتي
     let mediaRecorder;
     let audioChunks = [];
     let isRecording = false;
@@ -797,22 +795,36 @@
       input.value = '';
     }
 
-    /* التسجيل الصوتي (Vocal) */
+    /* التسجيل الصوتي المتوافق مع الآيفون وجميع الأجهزة */
     async function toggleRecording() {
       const btn = document.getElementById('vocal-btn');
 
       if (!isRecording) {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          mediaRecorder = new MediaRecorder(stream);
+          
+          let options = {};
+          if (MediaRecorder.isTypeSupported('audio/mp4')) {
+            options = { mimeType: 'audio/mp4' };
+          } else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            options = { mimeType: 'audio/webm;codecs=opus' };
+          } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+            options = { mimeType: 'audio/ogg;codecs=opus' };
+          }
+
+          mediaRecorder = new MediaRecorder(stream, options);
           audioChunks = [];
 
           mediaRecorder.ondataavailable = event => {
-            audioChunks.push(event.data);
+            if (event.data.size > 0) {
+              audioChunks.push(event.data);
+            }
           };
 
           mediaRecorder.onstop = async () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const mimeType = mediaRecorder.mimeType || 'audio/mp4';
+            const audioBlob = new Blob(audioChunks, { type: mimeType });
+            
             const reader = new FileReader();
             reader.readAsDataURL(audioBlob);
             reader.onloadend = () => {
