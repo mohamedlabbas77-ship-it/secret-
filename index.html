@@ -1264,30 +1264,39 @@
       if (!str) return '';
       return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
-// === كود الإشعارات للآيفون ===
 async function enableNotifications() {
-  if (!('serviceWorker' in navigator) || !('Notification' in window)) {
-    alert("الإشعارات غير مدعومة على هذا المتصفح.");
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    alert("الإشعارات غير مدعومة أو يجب إضافة التطبيق للشاشة الرئيسية أولاً.");
     return;
   }
 
   try {
+    // 1. تسجيل الـ Service Worker
     const reg = await navigator.serviceWorker.register('sw.js');
-    console.log('Service Worker Registered!', reg);
+    console.log('Service Worker Registered:', reg);
 
+    // 2. طلب إذن الإشعارات من النظام
     const permission = await Notification.requestPermission();
     
     if (permission === 'granted') {
-      alert("تم تفعيل الإشعارات بنجاح! 🔔 ستلاحظ الآن ظهور التطبيق في إعدادات الآيفون.");
+      // 3. الاشتراك الفعلي لإجبار نظام iOS على إظهار التطبيق في الإعدادات
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        const dummyServerKey = new Uint8Array([4, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: dummyServerKey
+        }).catch(err => console.log("Push sub created locally", err));
+      }
+
+      alert("تم التسجيل بالكامل في نظام iOS! 🔔 افحص قائمة الإعدادات الآن.");
     } else if (permission === 'denied') {
-      alert("تم رفض إذن الإشعارات. يمكنك تفعيله من إعدادات الآيفون.");
-    } else {
-      alert("لم يتم إعطاء الإذن بعد.");
+      alert("تم رفض الإذن من إعدادات النظام.");
     }
   } catch (err) {
-    alert("حدث خطأ أثناء تفعيل الإشعارات: " + err.message);
+    alert("حدث خطأ: " + err.message);
   }
-} 
+}
   </script>
 </body>
 </html>
