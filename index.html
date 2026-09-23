@@ -1,62 +1,152 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SOULEFED & MEDOUD ✨</title>
   
-  <!-- Manifest & iOS PWA Support -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="SOULEFED & MEDOUD">
-  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/733/733585.png">
+  <!-- Firebase SDKs (Compat v9) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
 
   <style>
     :root {
-      --bg-color: #0d0b18;
-      --card-bg: rgba(255, 255, 255, 0.05);
-      --accent-color: #ff4b72;
-      --blue-accent: #0084ff;
-      --text-color: #ffffff;
-      --subtext-color: #a0a0b0;
+      --bg-color: #0b0712;
+      --card-bg: rgba(22, 13, 35, 0.75);
+      --primary-color: #ff2a8d;
+      --accent-color: #00f2fe;
+      --text-color: #f8fafc;
+      --subtext-color: #94a3b8;
+      --border-color: rgba(255, 42, 141, 0.15);
+      
+      /* Snap-style gradients */
+      --snap-my-msg: linear-gradient(135deg, #ff2a8d, #ff5eb3);
+      --snap-other-msg: #1a1128;
+      --snap-card-bg: linear-gradient(145deg, rgba(26, 17, 40, 0.8), rgba(16, 10, 26, 0.9));
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       background-color: var(--bg-color);
       color: var(--text-color);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(255, 42, 141, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(0, 242, 254, 0.08) 0%, transparent 45%);
+      background-attachment: fixed;
+    }
+
+    /* Screen Login */
+    #login-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      background: rgba(11, 7, 18, 0.96);
+      backdrop-filter: blur(20px);
+      display: flex;
+      justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      padding-bottom: 40px;
+      padding: 20px;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 380px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 28px;
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .login-box h2 {
+      color: var(--primary-color);
+      margin-bottom: 8px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .login-box p {
+      color: var(--subtext-color);
+      font-size: 0.88rem;
+      margin-bottom: 24px;
+    }
+
+    input[type="password"], input[type="text"], textarea, input[type="date"], input[type="file"], select {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      color: #fff;
+      font-size: 0.92rem;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 12px rgba(255, 42, 141, 0.25);
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--snap-my-msg);
+      border: none;
+      border-radius: 20px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 42, 141, 0.3);
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .error-msg {
+      color: #ff4757;
+      font-size: 0.85rem;
+      margin-top: 12px;
+      display: none;
     }
 
     header {
-      width: 100%;
-      padding: 15px 20px;
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(11, 7, 18, 0.8);
+      backdrop-filter: blur(15px);
       position: sticky;
       top: 0;
       z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    .header-title {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: var(--accent-color);
+    .logo {
+      font-size: 1.15rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #ff2a8d, #00f2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .header-btns {
@@ -64,404 +154,1108 @@
       gap: 8px;
     }
 
-    .btn {
-      background: var(--blue-accent);
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
+    .notif-btn-head {
+      background: rgba(0, 242, 254, 0.12);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      color: var(--accent-color);
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 0.78rem;
+      font-weight: 700;
       cursor: pointer;
-      transition: 0.2s ease;
     }
 
-    .btn-logout {
-      background: rgba(255, 255, 255, 0.15);
-    }
-
+    /* Snap-Style Bottom Navigation Tabs */
     .nav-tabs {
       display: flex;
-      gap: 10px;
-      margin: 20px 0;
-      width: 90%;
-      max-width: 600px;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
       overflow-x: auto;
+      scrollbar-width: none;
     }
+    .nav-tabs::-webkit-scrollbar { display: none; }
 
     .tab-btn {
-      background: var(--card-bg);
+      padding: 9px 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 22px;
       color: var(--subtext-color);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 10px 18px;
-      border-radius: 12px;
       cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
       white-space: nowrap;
-      font-weight: 500;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .tab-btn.active {
-      background: var(--accent-color);
-      color: white;
-      border-color: var(--accent-color);
+      background: #ffffff;
+      color: #0b0712;
+      border-color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
     }
 
-    .section {
-      display: none;
-      width: 90%;
+    main {
+      flex: 1;
+      padding: 8px 16px 24px;
       max-width: 600px;
+      margin: 0 auto;
+      width: 100%;
     }
 
-    .section.active {
+    .tab-content {
+      display: none;
+      animation: snapFadeIn 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+    }
+
+    .tab-content.active {
       display: block;
     }
 
-    .card {
-      background: var(--card-bg);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
+    .add-form {
+      background: var(--snap-card-bg);
+      border: 1px solid var(--border-color);
       padding: 20px;
-      margin-bottom: 15px;
+      border-radius: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
     }
 
-    input, textarea {
+    .add-form h3 {
+      color: var(--accent-color);
+      margin-bottom: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .grid-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ----------- Snap-style Memory Cards ----------- */
+    .card {
+      background: var(--snap-card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 22px;
+      padding: 16px;
+      position: relative;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+    }
+
+    .card img {
       width: 100%;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-      padding: 12px;
-      color: white;
+      border-radius: 16px;
       margin-bottom: 12px;
-      outline: none;
+      max-height: 320px;
+      object-fit: cover;
     }
 
-    .submit-btn {
-      width: 100%;
-      background: var(--accent-color);
-      color: white;
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+      padding-right: 32px;
+    }
+
+    .card-date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 242, 254, 0.08);
+      color: var(--accent-color);
+      border: 1px solid rgba(0, 242, 254, 0.2);
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+      white-space: pre-line;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(255, 255, 255, 0.06);
       border: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-weight: bold;
+      color: rgba(255, 255, 255, 0.5);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
       cursor: pointer;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
     }
 
-    .chat-box {
-      height: 350px;
-      overflow-y: auto;
+    .delete-btn:active {
+      background: rgba(255, 71, 87, 0.2);
+      color: #ff4757;
+    }
+
+    /* ----------- Snap Objectives Checklist ----------- */
+    .progress-box {
+      background: var(--snap-card-bg);
+      border: 1px solid var(--border-color);
+      padding: 16px 18px;
+      border-radius: 22px;
+      margin-bottom: 16px;
+    }
+
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--accent-color);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      border-radius: 10px;
+      transition: width 0.4s ease;
+    }
+
+    .checklist-container {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      padding: 10px;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      margin-bottom: 12px;
-    }
-
-    .msg-bubble {
-      max-width: 75%;
-      padding: 10px 14px;
-      border-radius: 16px;
-      font-size: 0.95rem;
-      word-wrap: break-word;
-    }
-
-    .msg-left {
-      align-self: flex-start;
-      background: rgba(255, 255, 255, 0.1);
-      border-bottom-left-radius: 4px;
-    }
-
-    .msg-right {
-      align-self: flex-end;
-      background: var(--blue-accent);
-      border-bottom-right-radius: 4px;
-    }
-
-    .msg-sender {
-      font-size: 0.75rem;
-      color: var(--subtext-color);
-      margin-bottom: 4px;
-    }
-
-    .custom-checkbox {
-      width: auto;
-      margin-right: 10px;
     }
 
     .checklist-item {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      gap: 12px;
+      background: var(--snap-card-bg);
+      padding: 14px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.2s ease;
     }
 
-    .delete-btn {
-      background: transparent;
-      color: #ff4b4b;
-      border: none;
+    .checklist-item.done {
+      opacity: 0.5;
+      background: rgba(15, 10, 25, 0.4);
+    }
+
+    .checklist-item.done .checklist-text {
+      text-decoration: line-through;
+      color: var(--subtext-color);
+    }
+
+    .custom-checkbox {
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+      outline: none;
       cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .custom-checkbox:checked {
+      background-color: var(--primary-color);
+    }
+
+    .custom-checkbox:checked::after {
+      content: '✓';
+      position: absolute;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .checklist-text {
+      flex: 1;
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: #f1f5f9;
+    }
+
+    /* ----------- SNAPCHAT-INSPIRED CHAT INTERFACE ----------- */
+    .chat-container {
+      background: var(--snap-card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      display: flex;
+      flex-direction: column;
+      height: 75vh;
+      max-height: 680px;
+      overflow: hidden;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+    }
+
+    .chat-header {
+      padding: 12px 18px;
+      background: rgba(0, 0, 0, 0.35);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-user-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .chat-user-badge label {
+      font-size: 0.78rem;
+      color: var(--subtext-color);
+      font-weight: 600;
+    }
+
+    .chat-user-badge select {
+      width: auto;
+      padding: 2px 4px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      background: transparent;
+      border: none;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-bubble-wrapper {
+      display: flex;
+      flex-direction: column;
+      max-width: 80%;
+      position: relative;
+    }
+
+    .chat-bubble-wrapper.mine {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+
+    .chat-bubble-wrapper.other {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .chat-author {
+      font-size: 0.68rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+      padding: 0 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .chat-bubble-wrapper.mine .chat-author { color: var(--accent-color); }
+    .chat-bubble-wrapper.other .chat-author { color: var(--primary-color); }
+
+    .bubble-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .chat-bubble-wrapper.mine .bubble-row {
+      flex-direction: row-reverse;
+    }
+
+    .chat-bubble {
+      padding: 10px 15px;
+      border-radius: 20px;
+      font-size: 0.88rem;
+      line-height: 1.38;
+      word-break: break-word;
+      position: relative;
+    }
+
+    /* Snap-Style Pill Bubbles */
+    .chat-bubble-wrapper.mine .chat-bubble {
+      background: var(--snap-my-msg);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 3px 12px rgba(255, 42, 141, 0.25);
+    }
+
+    .chat-bubble-wrapper.other .chat-bubble {
+      background: var(--snap-other-msg);
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg-actions {
+      display: flex;
+      gap: 2px;
+      opacity: 0.3;
+      transition: opacity 0.2s;
+    }
+
+    .chat-bubble-wrapper:hover .msg-actions,
+    .chat-bubble-wrapper:active .msg-actions {
+      opacity: 1;
+    }
+
+    .msg-action-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 0.72rem;
+    }
+
+    .emoji-picker-popup {
+      display: none;
+      position: absolute;
+      bottom: 100%;
+      z-index: 10;
+      background: rgba(18, 11, 28, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 4px 10px;
+      gap: 8px;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+      margin-bottom: 6px;
+    }
+
+    .chat-bubble-wrapper.mine .emoji-picker-popup { right: 0; }
+    .chat-bubble-wrapper.other .emoji-picker-popup { left: 0; }
+
+    .emoji-picker-popup span {
+      cursor: pointer;
+      font-size: 1.15rem;
+      transition: transform 0.15s;
+    }
+
+    .emoji-picker-popup span:active { transform: scale(1.3); }
+
+    .msg-reactions {
+      display: flex;
+      gap: 3px;
+      margin-top: -5px;
+      z-index: 2;
+    }
+
+    .chat-bubble-wrapper.mine .msg-reactions { margin-right: 8px; }
+    .chat-bubble-wrapper.other .msg-reactions { margin-left: 8px; }
+
+    .reaction-badge {
+      background: rgba(11, 7, 18, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 1px 6px;
+      font-size: 0.72rem;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+    }
+
+    .chat-time {
+      font-size: 0.62rem;
+      opacity: 0.75;
+      margin-top: 4px;
+      display: block;
+      text-align: right;
+    }
+
+    audio {
+      max-width: 210px;
+      height: 38px;
+      margin-top: 4px;
+      border-radius: 20px;
+    }
+
+    .typing-indicator {
+      font-size: 0.75rem;
+      color: var(--accent-color);
+      padding: 2px 18px;
+      min-height: 18px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .typing-dots span {
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      background-color: var(--accent-color);
+      border-radius: 50%;
+      animation: snapTyping 1.4s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(1) { animation-delay: 0s; }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes snapTyping {
+      0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Snap Pill-shaped Input Bar */
+    .chat-input-area {
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .chat-input-area textarea {
+      resize: none;
+      height: 42px;
+      border-radius: 22px;
+      padding: 10px 16px;
+      font-size: 0.88rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .chat-btn-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: none;
+      color: #fff;
+      font-size: 1.05rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.15s ease;
+    }
+
+    .chat-btn-icon:active { transform: scale(0.9); }
+
+    .vocal-btn {
+      background: rgba(0, 242, 254, 0.12);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      color: var(--accent-color);
+    }
+
+    .vocal-btn.recording {
+      background: #ff4757;
+      border-color: #ff4757;
+      color: #fff;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
+      70% { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+    }
+
+    .send-btn {
+      background: var(--snap-my-msg);
+      box-shadow: 0 4px 12px rgba(255, 42, 141, 0.35);
+    }
+
+    @keyframes snapFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
 
+  <!-- Écran de verrouillage -->
+  <div id="login-screen">
+    <div class="login-box">
+      <h2>SOULEFED & MEDOUD ✨</h2>
+      <p>Entrez le mot de passe pour accéder à votre espace privé</p>
+      <input type="password" id="pass-input" placeholder="Mot de passe...">
+      <button class="btn" onclick="checkPassword()" style="margin-top: 14px;">Connexion 🔓</button>
+      <div id="error-msg" class="error-msg">Mot de passe incorrect!</div>
+    </div>
+  </div>
+
   <header>
-    <div class="header-title">SOULEFED & MEDOUD 💖</div>
+    <div class="logo">SOULEFED & MEDOUD ❤️</div>
     <div class="header-btns">
-      <button class="btn" onclick="enableNotifications()">🔔 Notifications</button>
+      <button class="notif-btn-head" onclick="enableNotifications()">🔔 Notifications</button>
+      <button class="btn" style="width: auto; padding: 6px 14px; font-size: 0.78rem; border-radius: 16px;" onclick="logout()">🔒 Déconnexion</button>
     </div>
   </header>
 
-  <!-- Navigation Tabs -->
   <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('souvenirs')">🖼️ Souvenirs</button>
-    <button class="tab-btn" onclick="switchTab('chat')">💬 Messages</button>
-    <button class="tab-btn" onclick="switchTab('bucket')">✨ Nos Objectifs</button>
+    <button class="tab-btn active" onclick="switchTab('memories', event)">📖 Souvenirs</button>
+    <button class="tab-btn" onclick="switchTab('gallery', event)">🖼️ Photos</button>
+    <button class="tab-btn" onclick="switchTab('notes', event)">💌 Messages</button>
+    <button class="tab-btn" onclick="switchTab('bucket', event)">✨ Nos Objectifs</button>
   </div>
 
-  <!-- Section Souvenirs -->
-  <div id="sec-souvenirs" class="section active">
-    <div class="card">
-      <h3>✨ Ajouter un souvenir</h3>
-      <input type="text" id="souvenir-title" placeholder="Titre du souvenir...">
-      <textarea id="souvenir-desc" placeholder="Racontez ce moment spécial..."></textarea>
-      <button class="submit-btn" onclick="addSouvenir()">Publier</button>
+  <main>
+    <!-- Souvenirs -->
+    <div id="memories-tab" class="tab-content active">
+      <div class="add-form">
+        <h3>✨ Ajouter un souvenir</h3>
+        <div class="form-grid">
+          <input type="text" id="mem-title" placeholder="Titre du souvenir...">
+          <input type="date" id="mem-date">
+        </div>
+        <textarea id="mem-desc" rows="3" placeholder="Racontez ce moment spécial..."></textarea>
+        <button class="btn" style="margin-top: 12px;" onclick="addMemory()">Enregistrer 💾</button>
+      </div>
+      <div id="memories-grid" class="grid-cards"></div>
     </div>
-    <div id="souvenirs-list"></div>
-  </div>
 
-  <!-- Section Chat -->
-  <div id="sec-chat" class="section">
-    <div class="card">
-      <h3>💬 Chat en direct</h3>
-      <div id="chat-box" class="chat-box"></div>
-      <input type="text" id="chat-input" placeholder="Écrivez un message..." onkeypress="handleKeyPress(event)">
-      <button class="submit-btn" onclick="sendMessage()">Envoyer</button>
+    <!-- Photos -->
+    <div id="gallery-tab" class="tab-content">
+      <div class="add-form">
+        <h3>📷 Ajouter une photo</h3>
+        <div class="form-grid">
+          <input type="file" id="img-file" accept="image/*">
+          <input type="text" id="img-caption" placeholder="Légende...">
+        </div>
+        <button class="btn" onclick="uploadImage()">Importer la Photo 📷</button>
+      </div>
+      <div id="gallery-grid" class="grid-cards"></div>
     </div>
-  </div>
 
-  <!-- Section Bucket List -->
-  <div id="sec-bucket" class="section">
-    <div class="card">
-      <h3>🎯 Nos Objectifs</h3>
-      <input type="text" id="bucket-input" placeholder="Ajouter un objectif...">
-      <button class="submit-btn" onclick="addBucketItem()">Ajouter</button>
-    </div>
-    <div class="card">
-      <div id="bucket-list"></div>
-    </div>
-  </div>
+    <!-- Messages / Snap-Style Chat -->
+    <div id="notes-tab" class="tab-content">
+      <div class="chat-container">
+        <div class="chat-header">
+          <div class="chat-user-badge">
+            <label for="current-user">Profil :</label>
+            <select id="current-user" onchange="onUserChange()">
+              <option value="Mohamed">Mohamed ♂️</option>
+              <option value="Soulefed">Soulefed ♀️</option>
+            </select>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--accent-color); font-weight: 700;">En direct ✨</span>
+        </div>
 
-  <!-- Firebase Integration -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+        <div id="chat-messages" class="chat-messages" onclick="closeAllEmojiPickers(event)"></div>
+
+        <div id="typing-status" class="typing-indicator"></div>
+
+        <div class="chat-input-area">
+          <button id="vocal-btn" class="chat-btn-icon vocal-btn" onclick="toggleRecording()" title="Vocal">🎙️</button>
+          <textarea id="chat-input" placeholder="Envoyer un message..." oninput="handleTyping()" onkeydown="handleKeyDown(event)"></textarea>
+          <button class="chat-btn-icon send-btn" onclick="sendChatMessage()">➔</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Objectifs -->
+    <div id="bucket-tab" class="tab-content">
+      <div class="add-form">
+        <h3>🎯 Ajouter un objectif</h3>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="bucket-text" placeholder="Objectif commun..." style="flex: 1;">
+          <button class="btn" style="width: auto; padding: 0 18px;" onclick="addBucket()">Ajouter ✨</button>
+        </div>
+      </div>
+
+      <div class="progress-box">
+        <div class="progress-text">
+          <span>Progression</span>
+          <span id="progress-percent">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="progress-bar-fill" class="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <div id="bucket-list" class="checklist-container"></div>
+    </div>
+  </main>
 
   <script>
-    // ==========================================
-    // 1. Firebase Configuration
-    // ==========================================
     const firebaseConfig = {
-      apiKey: "AIzaSyDummyKeyForRealtimeDBConfig",
-      authDomain: "soulefed-medoud.firebaseapp.com",
-      databaseURL: "https://soulefed-medoud-default-rtdb.firebaseio.com",
-      projectId: "soulefed-medoud",
-      storageBucket: "soulefed-medoud.appspot.com",
-      messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:abcdef123456"
+      apiKey: "AIzaSyDeyfQGykcAxJX_75tQFB8N6sGrRjgTRLI",
+      authDomain: "ourspace-f0378.firebaseapp.com",
+      databaseURL: "https://ourspace-f0378-default-rtdb.firebaseio.com",
+      projectId: "ourspace-f0378",
+      storageBucket: "ourspace-f0378.firebasestorage.app",
+      messagingSenderId: "996661499365",
+      appId: "1:996661499365:web:c35676b1d16ae900e48b0c",
+      measurementId: "G-1BM636JWTY"
     };
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
+    firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // ==========================================
-    // 2. Navigation Control
-    // ==========================================
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+    const SECRET_PASS = "SOULEFED&MEDOUD";
+    let typingTimeout = null;
 
-      if (tabName === 'souvenirs') {
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.getElementById('sec-souvenirs').classList.add('active');
-      } else if (tabName === 'chat') {
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        document.getElementById('sec-chat').classList.add('active');
-      } else if (tabName === 'bucket') {
-        document.querySelectorAll('.tab-btn')[2].classList.add('active');
-        document.getElementById('sec-bucket').classList.add('active');
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+    let audioStream = null;
+
+    window.onload = function() {
+      if (localStorage.getItem('isLoggedIn') === 'true') {
+        document.getElementById('login-screen').style.display = 'none';
+        
+        const savedUser = localStorage.getItem('chat_user');
+        if (savedUser) {
+          document.getElementById('current-user').value = savedUser;
+        }
+
+        listenToData();
+      }
+    };
+
+    function checkPassword() {
+      const input = document.getElementById('pass-input').value;
+      if (input === SECRET_PASS) {
+        localStorage.setItem('isLoggedIn', 'true');
+        document.getElementById('login-screen').style.display = 'none';
+        listenToData();
+      } else {
+        document.getElementById('error-msg').style.display = 'block';
       }
     }
 
-    // ==========================================
-    // 3. Enable Notifications for iOS & PWA
-    // ==========================================
+    function logout() {
+      localStorage.setItem('isLoggedIn', 'false');
+      location.reload();
+    }
+
+    function switchTab(tabName, event) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(tabName + '-tab').classList.add('active');
+
+      if (tabName === 'notes') {
+        scrollToBottom();
+      }
+    }
+
+    function onUserChange() {
+      const selectedUser = document.getElementById('current-user').value;
+      localStorage.setItem('chat_user', selectedUser);
+      listenToData();
+    }
+
     async function enableNotifications() {
-      if (!('serviceWorker' in navigator) || !('Notification' in window)) {
-        alert("الإشعارات غير مدعومة أو يجب إضافة التطبيق للشاشة الرئيسية أولاً.");
+      if (!('Notification' in window)) {
+        alert("Votre navigateur ne prend pas en charge les notifications.");
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        alert("Notifications activées avec succès! 🔔");
+      } else {
+        alert("Veuillez autoriser les notifications dans les paramètres du navigateur.");
+      }
+    }
+
+    function listenToData() {
+      db.ref('memories').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        renderMemories(Object.entries(data).map(([id, val]) => ({ id, ...val })));
+      });
+
+      db.ref('gallery').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        renderGallery(Object.entries(data).map(([id, val]) => ({ id, ...val })));
+      });
+
+      db.ref('notes').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        renderChatMessages(Object.entries(data).map(([id, val]) => ({ id, ...val })));
+      });
+
+      db.ref('typing').on('value', snapshot => {
+        const typingData = snapshot.val() || {};
+        const currentUser = document.getElementById('current-user').value;
+        const typingIndicator = document.getElementById('typing-status');
+
+        let isOtherTyping = false;
+        let typingUser = '';
+
+        Object.keys(typingData).forEach(user => {
+          if (user !== currentUser && typingData[user] === true) {
+            isOtherTyping = true;
+            typingUser = user;
+          }
+        });
+
+        if (isOtherTyping) {
+          typingIndicator.innerHTML = `
+            <span>${typingUser} écrit</span>
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+          `;
+        } else {
+          typingIndicator.innerHTML = '';
+        }
+      });
+
+      db.ref('bucket').on('value', snapshot => {
+        const data = snapshot.val() || {};
+        renderBucket(Object.entries(data).map(([id, val]) => ({ id, ...val })));
+      });
+    }
+
+    /* Souvenirs */
+    function addMemory() {
+      const title = document.getElementById('mem-title').value.trim();
+      const date = document.getElementById('mem-date').value;
+      const desc = document.getElementById('mem-desc').value.trim();
+
+      if (!title || !desc) return alert('Veuillez remplir le titre et la description');
+
+      db.ref('memories').push({ title, date, desc });
+      document.getElementById('mem-title').value = '';
+      document.getElementById('mem-date').value = '';
+      document.getElementById('mem-desc').value = '';
+    }
+
+    function renderMemories(items) {
+      const grid = document.getElementById('memories-grid');
+      
+      if (items.length === 0) {
+        grid.innerHTML = `<p style="text-align: center; color: var(--subtext-color); padding: 30px;">Aucun souvenir enregistré... ✨</p>`;
         return;
       }
 
-      try {
-        const reg = await navigator.serviceWorker.register('sw.js');
-        console.log('Service Worker Registered Successfully:', reg);
-
-        const permission = await Notification.requestPermission();
-        
-        if (permission === 'granted') {
-          if ('PushManager' in window) {
-            let sub = await reg.pushManager.getSubscription();
-            if (!sub) {
-              const dummyServerKey = new Uint8Array([4, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
-              await reg.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: dummyServerKey
-              }).catch(err => console.log("Push sub created locally", err));
-            }
-          }
-          alert("تم تفعيل الإشعارات بنجاح! 🔔 ستلاحظ الآن ظهور التطبيق في إعدادات الآيفون.");
-        } else if (permission === 'denied') {
-          alert("تم رفض إذن الإشعارات من إعدادات الآيفون.");
-        }
-      } catch (err) {
-        alert("حدث خطأ أثناء التفعيل: " + err.message);
-      }
+      grid.innerHTML = items.map(item => `
+        <div class="card">
+          <button class="delete-btn" title="Supprimer" onclick="deleteItem('memories', '${item.id}')">✕</button>
+          <div class="card-title">${escapeHtml(item.title)}</div>
+          ${item.date ? `<div class="card-date-badge">📅 ${item.date}</div>` : ''}
+          <div class="card-desc">${escapeHtml(item.desc)}</div>
+        </div>
+      `).join('');
     }
 
-    function sendLocalNotification(title, body) {
-      if (!("Notification" in window) || Notification.permission !== "granted") return;
+    /* Photos */
+    function uploadImage() {
+      const fileInput = document.getElementById('img-file');
+      const caption = document.getElementById('img-caption').value;
 
-      const options = {
-        body: body || "لديك تحديث جديد ✨",
-        icon: 'https://cdn-icons-png.flaticon.com/512/733/733585.png',
-        badge: 'https://cdn-icons-png.flaticon.com/512/733/733585.png'
+      if (fileInput.files.length === 0) return alert('Veuillez sélectionner une photo');
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        db.ref('gallery').push({ url: e.target.result, caption: caption });
+        fileInput.value = '';
+        document.getElementById('img-caption').value = '';
       };
 
-      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.ready.then(registration => {
-          registration.showNotification(title, options);
-        });
-      } else {
-        new Notification(title, options);
+      reader.readAsDataURL(file);
+    }
+
+    function renderGallery(items) {
+      const grid = document.getElementById('gallery-grid');
+      grid.innerHTML = items.map(item => `
+        <div class="card">
+          <button class="delete-btn" title="Supprimer" onclick="deleteItem('gallery', '${item.id}')">✕</button>
+          <img src="${item.url}" alt="Photo">
+          <div class="card-desc" style="text-align: center;">${escapeHtml(item.caption || '')}</div>
+        </div>
+      `).join('');
+    }
+
+    /* Messages / Snap Chat */
+    function handleTyping() {
+      const currentUser = document.getElementById('current-user').value;
+      db.ref(`typing/${currentUser}`).set(true);
+
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        db.ref(`typing/${currentUser}`).set(false);
+      }, 2000);
+    }
+
+    function handleKeyDown(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChatMessage();
       }
     }
 
-    // ==========================================
-    // 4. Chat & Database Functionality
-    // ==========================================
-    function sendMessage() {
+    function sendChatMessage() {
+      const currentUser = document.getElementById('current-user').value;
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
+
       if (!text) return;
 
-      db.ref('chat').push({
-        sender: 'Medoud',
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+      db.ref('notes').push({
+        sender: currentUser,
         text: text,
-        timestamp: Date.now()
+        type: 'text',
+        time: timeStr,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
       });
 
+      db.ref(`typing/${currentUser}`).set(false);
       input.value = '';
     }
 
-    function handleKeyPress(e) {
-      if (e.key === 'Enter') sendMessage();
-    }
+    /* VOCAL RECORDING FOR ALL BROWSERS & PHONES */
+    async function toggleRecording() {
+      const btn = document.getElementById('vocal-btn');
 
-    db.ref('chat').on('value', (snapshot) => {
-      const chatBox = document.getElementById('chat-box');
-      chatBox.innerHTML = '';
-      const data = snapshot.val();
-      if (!data) return;
+      if (!isRecording) {
+        try {
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert("Votre navigateur ne prend pas en charge l'enregistrement vocal.");
+            return;
+          }
 
-      Object.values(data).forEach(msg => {
-        const div = document.createElement('div');
-        div.className = `msg-bubble ${msg.sender === 'Medoud' ? 'msg-right' : 'msg-left'}`;
-        div.innerHTML = `<div class="msg-sender">${msg.sender}</div><div>${escapeHtml(msg.text)}</div>`;
-        chatBox.appendChild(div);
-      });
-      chatBox.scrollTop = chatBox.scrollHeight;
-    });
+          audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          
+          let options = {};
+          if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            options = { mimeType: 'audio/webm;codecs=opus' };
+          } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+            options = { mimeType: 'audio/mp4' };
+          } else if (MediaRecorder.isTypeSupported('audio/aac')) {
+            options = { mimeType: 'audio/aac' };
+          }
 
-    // Listen for new chat messages to send notifications
-    db.ref('chat').limitToLast(1).on('child_added', (snapshot) => {
-      const msg = snapshot.val();
-      if (msg && msg.sender !== 'Medoud') {
-        sendLocalNotification(`Nouveau message de ${msg.sender} ✨`, msg.text);
+          mediaRecorder = new MediaRecorder(audioStream, options);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = event => {
+            if (event.data && event.data.size > 0) {
+              audioChunks.push(event.data);
+            }
+          };
+
+          mediaRecorder.onstop = () => {
+            const mimeType = mediaRecorder.mimeType || 'audio/webm';
+            const audioBlob = new Blob(audioChunks, { type: mimeType });
+            
+            if (audioBlob.size === 0) return;
+
+            const reader = new FileReader();
+            reader.readAsDataURL(audioBlob);
+            reader.onloadend = () => {
+              const base64Audio = reader.result;
+              const currentUser = document.getElementById('current-user').value;
+              const now = new Date();
+              const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+              db.ref('notes').push({
+                sender: currentUser,
+                audio: base64Audio,
+                type: 'audio',
+                time: timeStr,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+              });
+            };
+
+            if (audioStream) {
+              audioStream.getTracks().forEach(track => track.stop());
+            }
+          };
+
+          mediaRecorder.start(100);
+          isRecording = true;
+          btn.classList.add('recording');
+          btn.innerText = '⏹️';
+        } catch (err) {
+          alert("Impossible d'accéder au micro : " + (err.message || err.name));
+        }
+      } else {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
+        isRecording = false;
+        btn.classList.remove('recording');
+        btn.innerText = '🎙️';
       }
-    });
-
-    // ==========================================
-    // 5. Souvenirs & Bucket List Management
-    // ==========================================
-    function addSouvenir() {
-      const title = document.getElementById('souvenir-title').value.trim();
-      const desc = document.getElementById('souvenir-desc').value.trim();
-      if (!title) return;
-
-      db.ref('souvenirs').push({ title, desc, date: new Date().toLocaleDateString('fr-FR') });
-      document.getElementById('souvenir-title').value = '';
-      document.getElementById('souvenir-desc').value = '';
     }
 
-    db.ref('souvenirs').on('value', (snapshot) => {
-      const container = document.getElementById('souvenirs-list');
-      container.innerHTML = '';
-      const data = snapshot.val();
-      if (!data) return;
+    function toggleEmojiPicker(msgId, e) {
+      if (e) e.stopPropagation();
+      const popup = document.getElementById(`emoji-picker-${msgId}`);
+      if (popup) {
+        const isVisible = popup.style.display === 'flex';
+        closeAllEmojiPickers();
+        if (!isVisible) popup.style.display = 'flex';
+      }
+    }
 
-      Object.entries(data).forEach(([id, item]) => {
-        const div = document.createElement('div');
-        div.className = 'card';
-        div.innerHTML = `
-          <h4>${escapeHtml(item.title)} <small style="font-size:0.75rem; color:var(--subtext-color);">(${item.date})</small></h4>
-          <p style="margin-top:8px; color:var(--subtext-color);">${escapeHtml(item.desc)}</p>
-          <button class="delete-btn" style="margin-top:10px;" onclick="deleteItem('souvenirs', '${id}')">Supprimer</button>
+    function closeAllEmojiPickers(e) {
+      document.querySelectorAll('.emoji-picker-popup').forEach(el => el.style.display = 'none');
+    }
+
+    function addReaction(msgId, emoji) {
+      const currentUser = document.getElementById('current-user').value;
+      db.ref(`notes/${msgId}/reactions/${currentUser}`).set(emoji);
+      closeAllEmojiPickers();
+    }
+
+    function renderChatMessages(items) {
+      const container = document.getElementById('chat-messages');
+      const currentUser = document.getElementById('current-user').value;
+
+      items.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+      container.innerHTML = items.map(msg => {
+        const isMine = msg.sender === currentUser;
+        const reactions = msg.reactions || {};
+        const reactionEntries = Object.entries(reactions);
+
+        return `
+          <div class="chat-bubble-wrapper ${isMine ? 'mine' : 'other'}">
+            <span class="chat-author">${escapeHtml(msg.sender)}</span>
+            
+            <div style="position: relative; width: 100%;">
+              <div class="emoji-picker-popup" id="emoji-picker-${msg.id}">
+                <span onclick="addReaction('${msg.id}', '❤️')">❤️</span>
+                <span onclick="addReaction('${msg.id}', '🔥')">🔥</span>
+                <span onclick="addReaction('${msg.id}', '😂')">😂</span>
+                <span onclick="addReaction('${msg.id}', '😮')">😮</span>
+                <span onclick="addReaction('${msg.id}', '👍')">👍</span>
+              </div>
+
+              <div class="bubble-row">
+                <div class="chat-bubble">
+                  ${msg.type === 'audio' 
+                    ? `<audio controls src="${msg.audio}"></audio>` 
+                    : escapeHtml(msg.text)}
+                  <span class="chat-time">${msg.time || ''}</span>
+                </div>
+
+                <div class="msg-actions">
+                  <button class="msg-action-btn" onclick="toggleEmojiPicker('${msg.id}', event)">😊</button>
+                  <button class="msg-action-btn" onclick="deleteItem('notes', '${msg.id}')">✕</button>
+                </div>
+              </div>
+            </div>
+
+            ${reactionEntries.length > 0 ? `
+              <div class="msg-reactions">
+                ${reactionEntries.map(([user, emoji]) => `
+                  <div class="reaction-badge" title="${user}">${emoji}</div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
         `;
-        container.appendChild(div);
-      });
-    });
+      }).join('');
 
-    function addBucketItem() {
-      const input = document.getElementById('bucket-input');
+      scrollToBottom();
+    }
+
+    function scrollToBottom() {
+      const container = document.getElementById('chat-messages');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    /* Objectifs */
+    function addBucket() {
+      const input = document.getElementById('bucket-text');
       const text = input.value.trim();
+
       if (!text) return;
 
-      db.ref('bucket').push({ text, done: false });
+      db.ref('bucket').push({ text: text, done: false });
       input.value = '';
     }
 
-    db.ref('bucket').on('value', (snapshot) => {
-      const container = document.getElementById('bucket-list');
-      container.innerHTML = '';
-      const data = snapshot.val();
-      if (!data) {
-        container.innerHTML = '<p style="text-align:center; color:var(--subtext-color);">Aucun objectif pour le moment.</p>';
+    function toggleBucket(id, currentStatus) {
+      db.ref(`bucket/${id}`).update({ done: !currentStatus });
+    }
+
+    function renderBucket(items) {
+      const list = document.getElementById('bucket-list');
+      const fill = document.getElementById('progress-bar-fill');
+      const percentText = document.getElementById('progress-percent');
+
+      if (items.length === 0) {
+        list.innerHTML = `<p style="text-align: center; color: var(--subtext-color); padding: 20px;">Aucun objectif pour le moment... 🎯</p>`;
+        fill.style.width = '0%';
+        percentText.innerText = '0%';
         return;
       }
 
-      Object.entries(data).forEach(([id, item]) => {
-        const div = document.createElement('div');
-        div.className = 'checklist-item';
-        div.innerHTML = `
-          <div>
-            <input type="checkbox" class="custom-checkbox" ${item.done ? 'checked' : ''} onclick="toggleBucket('${id}', ${!item.done})">
-            <span style="${item.done ? 'text-decoration: line-through; color:var(--subtext-color);' : ''}">${escapeHtml(item.text)}</span>
-          </div>
-          <button class="delete-btn" onclick="deleteItem('bucket', '${id}')">✕</button>
-        `;
-        container.appendChild(div);
-      });
-    });
+      const completedCount = items.filter(i => i.done).length;
+      const percentage = Math.round((completedCount / items.length) * 100);
 
-    function toggleBucket(id, status) {
-      db.ref(`bucket/${id}`).update({ done: status });
+      fill.style.width = percentage + '%';
+      percentText.innerText = percentage + '%';
+
+      list.innerHTML = items.map(item => `
+        <div class="checklist-item ${item.done ? 'done' : ''}">
+          <input type="checkbox" class="custom-checkbox" ${item.done ? 'checked' : ''} onclick="toggleBucket('${item.id}', ${item.done})">
+          <span class="checklist-text">${escapeHtml(item.text)}</span>
+          <button class="delete-btn" style="position: static;" onclick="deleteItem('bucket', '${item.id}')">✕</button>
+        </div>
+      `).join('');
     }
 
     function deleteItem(path, id) {
-      if (confirm("Voulez-vous vraiment supprimer cet élément ?")) {
+      if (confirm('Voulez-vous vraiment supprimer cet élément ?')) {
         db.ref(`${path}/${id}`).remove();
       }
     }
@@ -470,6 +1264,73 @@
       if (!str) return '';
       return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
+async function enableNotifications() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    alert("الإشعارات غير مدعومة أو يجب إضافة التطبيق للشاشة الرئيسية أولاً.");
+    return;
+  }
+
+  try {
+    // 1. تسجيل الـ Service Worker
+    const reg = await navigator.serviceWorker.register('sw.js');
+    console.log('Service Worker Registered:', reg);
+
+    // 2. طلب إذن الإشعارات من النظام
+    const permission = await Notification.requestPermission();
+    
+    if (permission === 'granted') {
+      // 3. الاشتراك الفعلي لإجبار نظام iOS على إظهار التطبيق في الإعدادات
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        const dummyServerKey = new Uint8Array([4, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: dummyServerKey
+        }).catch(err => console.log("Push sub created locally", err));
+      }
+
+      alert("تم التسجيل بالكامل في نظام iOS! 🔔 افحص قائمة الإعدادات الآن.");
+    } else if (permission === 'denied') {
+      alert("تم رفض الإذن من إعدادات النظام.");
+    }
+  } catch (err) {
+    alert("حدث خطأ: " + err.message);
+  }
+}
+// ==========================================
+// دالة تفعيل الإشعارات للآيفون (iOS PWA)
+// ==========================================
+async function enableNotifications() {
+  if (!('serviceWorker' in navigator) || !('Notification' in window)) {
+    alert("الإشعارات غير مدعومة أو يجب إضافة التطبيق للشاشة الرئيسية أولاً.");
+    return;
+  }
+
+  try {
+    const reg = await navigator.serviceWorker.register('sw.js');
+    console.log('Service Worker Registered Successfully:', reg);
+
+    const permission = await Notification.requestPermission();
+    
+    if (permission === 'granted') {
+      if ('PushManager' in window) {
+        let sub = await reg.pushManager.getSubscription();
+        if (!sub) {
+          const dummyServerKey = new Uint8Array([4, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+          await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: dummyServerKey
+          }).catch(err => console.log("Push sub created locally", err));
+        }
+      }
+      alert("تم تفعيل الإشعارات بنجاح! 🔔 ستلاحظ الآن ظهور التطبيق في إعدادات الآيفون.");
+    } else if (permission === 'denied') {
+      alert("تم رفض إذن الإشعارات من إعدادات الآيفون.");
+    }
+  } catch (err) {
+    alert("حدث خطأ أثناء التفعيل: " + err.message);
+  }
+}
   </script>
 </body>
 </html>
