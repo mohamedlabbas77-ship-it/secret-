@@ -1264,6 +1264,30 @@
       if (!str) return '';
       return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
+// === كود الإشعارات للآيفون ===
+async function enableNotifications() {
+  if (!('serviceWorker' in navigator) || !('Notification' in window)) {
+    alert("الإشعارات غير مدعومة على هذا المتصفح.");
+    return;
+  }
+
+  try {
+    const reg = await navigator.serviceWorker.register('sw.js');
+    console.log('Service Worker Registered!', reg);
+
+    const permission = await Notification.requestPermission();
+    
+    if (permission === 'granted') {
+      alert("تم تفعيل الإشعارات بنجاح! 🔔 ستلاحظ الآن ظهور التطبيق في إعدادات الآيفون.");
+    } else if (permission === 'denied') {
+      alert("تم رفض إذن الإشعارات. يمكنك تفعيله من إعدادات الآيفون.");
+    } else {
+      alert("لم يتم إعطاء الإذن بعد.");
+    }
+  } catch (err) {
+    alert("حدث خطأ أثناء تفعيل الإشعارات: " + err.message);
+  }
+} 
   </script>
 </body>
 </html>
