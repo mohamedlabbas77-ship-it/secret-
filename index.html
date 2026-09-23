@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SOULEFED & MEDOUD | Notre Espace Privé ✨</title>
+  <title>SOULEFED & MEDOUD ✨</title>
   
   <!-- Firebase SDKs (Compat v9) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -11,21 +11,26 @@
 
   <style>
     :root {
-      --bg-color: #0d0714;
-      --card-bg: rgba(23, 14, 38, 0.7);
-      --primary-color: #ff2e93;
+      --bg-color: #0b0712;
+      --card-bg: rgba(22, 13, 35, 0.75);
+      --primary-color: #ff2a8d;
       --accent-color: #00f2fe;
-      --text-color: #f1f5f9;
-      --border-color: rgba(255, 46, 147, 0.2);
-      --chat-my-msg: linear-gradient(135deg, #e0257e, #ff5293);
-      --chat-other-msg: #1c122c;
+      --text-color: #f8fafc;
+      --subtext-color: #94a3b8;
+      --border-color: rgba(255, 42, 141, 0.15);
+      
+      /* Snap-style gradients */
+      --snap-my-msg: linear-gradient(135deg, #ff2a8d, #ff5eb3);
+      --snap-other-msg: #1a1128;
+      --snap-card-bg: linear-gradient(145deg, rgba(26, 17, 40, 0.8), rgba(16, 10, 26, 0.9));
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -36,16 +41,18 @@
       flex-direction: column;
       overflow-x: hidden;
       background-image: 
-        radial-gradient(circle at 10% 20%, rgba(255, 46, 147, 0.1) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.08) 0%, transparent 40%);
+        radial-gradient(circle at 15% 15%, rgba(255, 42, 141, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(0, 242, 254, 0.08) 0%, transparent 45%);
+      background-attachment: fixed;
     }
 
+    /* Screen Login */
     #login-screen {
       position: fixed;
       inset: 0;
       z-index: 999;
-      background: rgba(13, 7, 20, 0.96);
-      backdrop-filter: blur(15px);
+      background: rgba(11, 7, 18, 0.96);
+      backdrop-filter: blur(20px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -54,126 +61,136 @@
 
     .login-box {
       width: 100%;
-      max-width: 400px;
+      max-width: 380px;
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 30px 20px;
+      border-radius: 28px;
+      padding: 32px 24px;
       text-align: center;
-      box-shadow: 0 0 30px rgba(255, 46, 147, 0.15);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     }
 
     .login-box h2 {
       color: var(--primary-color);
       margin-bottom: 8px;
-      font-size: 1.6rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
     }
 
     .login-box p {
-      color: #94a3b8;
-      font-size: 0.9rem;
-      margin-bottom: 22px;
+      color: var(--subtext-color);
+      font-size: 0.88rem;
+      margin-bottom: 24px;
     }
 
     input[type="password"], input[type="text"], textarea, input[type="date"], input[type="file"], select {
       width: 100%;
-      padding: 10px 14px;
-      background: rgba(0, 0, 0, 0.4);
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.35);
       border: 1px solid var(--border-color);
-      border-radius: 12px;
+      border-radius: 16px;
       color: #fff;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       outline: none;
-      transition: all 0.3s;
+      transition: all 0.25s ease;
     }
 
     input:focus, textarea:focus, select:focus {
       border-color: var(--primary-color);
-      box-shadow: 0 0 10px rgba(255, 46, 147, 0.25);
+      box-shadow: 0 0 12px rgba(255, 42, 141, 0.25);
+      background: rgba(0, 0, 0, 0.5);
     }
 
     .btn {
       width: 100%;
-      padding: 11px;
-      background: linear-gradient(45deg, var(--primary-color), #ff5293);
+      padding: 12px;
+      background: var(--snap-my-msg);
       border: none;
-      border-radius: 12px;
+      border-radius: 20px;
       color: #fff;
       font-size: 0.95rem;
-      font-weight: bold;
+      font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 0 12px rgba(255, 46, 147, 0.3);
-      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 42, 141, 0.3);
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
     }
 
-    .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 20px rgba(255, 46, 147, 0.5);
+    .btn:active {
+      transform: scale(0.97);
     }
 
     .error-msg {
       color: #ff4757;
       font-size: 0.85rem;
-      margin-top: 10px;
+      margin-top: 12px;
       display: none;
     }
 
     header {
-      padding: 14px 5%;
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border-color);
-      background: rgba(13, 7, 20, 0.85);
-      backdrop-filter: blur(10px);
+      background: rgba(11, 7, 18, 0.8);
+      backdrop-filter: blur(15px);
       position: sticky;
       top: 0;
       z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .logo {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: var(--primary-color);
-      text-shadow: 0 0 8px rgba(255, 46, 147, 0.4);
+      font-size: 1.15rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #ff2a8d, #00f2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
+    /* Snap-Style Bottom Navigation Tabs */
     .nav-tabs {
       display: flex;
       justify-content: center;
       gap: 8px;
-      padding: 12px 4% 8px;
-      flex-wrap: wrap;
+      padding: 12px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
     }
+    .nav-tabs::-webkit-scrollbar { display: none; }
 
     .tab-btn {
-      padding: 8px 16px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-color);
-      border-radius: 25px;
-      color: #aaa;
+      padding: 9px 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 22px;
+      color: var(--subtext-color);
       cursor: pointer;
-      font-size: 0.88rem;
-      transition: all 0.3s;
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .tab-btn.active, .tab-btn:hover {
-      background: var(--primary-color);
-      color: #fff;
-      box-shadow: 0 0 12px rgba(255, 46, 147, 0.4);
+    .tab-btn.active {
+      background: #ffffff;
+      color: #0b0712;
+      border-color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
     }
 
     main {
       flex: 1;
-      padding: 12px 4%;
-      max-width: 900px;
+      padding: 8px 16px 24px;
+      max-width: 600px;
       margin: 0 auto;
       width: 100%;
     }
 
     .tab-content {
       display: none;
-      animation: fadeIn 0.4s ease;
+      animation: snapFadeIn 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
     }
 
     .tab-content.active {
@@ -181,18 +198,20 @@
     }
 
     .add-form {
-      background: var(--card-bg);
+      background: var(--snap-card-bg);
       border: 1px solid var(--border-color);
-      padding: 18px;
-      border-radius: 16px;
+      padding: 20px;
+      border-radius: 24px;
       margin-bottom: 20px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
     }
 
     .add-form h3 {
       color: var(--accent-color);
       margin-bottom: 14px;
-      font-size: 1.05rem;
+      font-size: 1rem;
+      font-weight: 700;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -200,67 +219,62 @@
 
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-      margin-bottom: 12px;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .grid-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-    }
-
-    /* ----------- Memory Cards ----------- */
-    .card {
-      background: linear-gradient(145deg, rgba(28, 17, 46, 0.85), rgba(15, 9, 25, 0.85));
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 18px;
-      position: relative;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
       display: flex;
       flex-direction: column;
-      backdrop-filter: blur(10px);
+      gap: 14px;
+    }
+
+    /* ----------- Snap-style Memory Cards ----------- */
+    .card {
+      background: var(--snap-card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 22px;
+      padding: 16px;
+      position: relative;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.25);
     }
 
     .card img {
       width: 100%;
-      height: auto;
-      max-height: 380px;
-      object-fit: contain;
-      border-radius: 12px;
+      border-radius: 16px;
       margin-bottom: 12px;
-      background: rgba(0, 0, 0, 0.3);
+      max-height: 320px;
+      object-fit: cover;
     }
 
     .card-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #ffffff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
       margin-bottom: 6px;
-      padding-right: 30px;
+      padding-right: 32px;
     }
 
     .card-date-badge {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      background: rgba(0, 242, 254, 0.1);
+      background: rgba(0, 242, 254, 0.08);
       color: var(--accent-color);
-      border: 1px solid rgba(0, 242, 254, 0.25);
-      padding: 3px 8px;
-      border-radius: 14px;
-      font-size: 0.75rem;
+      border: 1px solid rgba(0, 242, 254, 0.2);
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.72rem;
       font-weight: 600;
-      width: fit-content;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .card-desc {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: #cbd5e1;
-      line-height: 1.5;
+      line-height: 1.45;
       white-space: pre-line;
     }
 
@@ -268,44 +282,48 @@
       position: absolute;
       top: 14px;
       right: 14px;
-      background: rgba(255, 71, 87, 0.12);
-      border: 1px solid rgba(255, 71, 87, 0.25);
-      color: #ff4757;
+      background: rgba(255, 255, 255, 0.06);
+      border: none;
+      color: rgba(255, 255, 255, 0.5);
       width: 28px;
       height: 28px;
-      border-radius: 8px;
+      border-radius: 50%;
       cursor: pointer;
       font-size: 0.8rem;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: all 0.2s;
     }
 
-    /* ----------- Objectives ----------- */
+    .delete-btn:active {
+      background: rgba(255, 71, 87, 0.2);
+      color: #ff4757;
+    }
+
+    /* ----------- Snap Objectives Checklist ----------- */
     .progress-box {
-      background: rgba(255, 255, 255, 0.03);
+      background: var(--snap-card-bg);
       border: 1px solid var(--border-color);
-      padding: 14px 16px;
-      border-radius: 14px;
+      padding: 16px 18px;
+      border-radius: 22px;
       margin-bottom: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
     }
 
     .progress-text {
       display: flex;
       justify-content: space-between;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--accent-color);
-      font-weight: 600;
+      font-weight: 700;
+      margin-bottom: 8px;
     }
 
     .progress-bar-bg {
       width: 100%;
-      height: 7px;
+      height: 8px;
       background: rgba(0, 0, 0, 0.4);
-      border-radius: 8px;
+      border-radius: 10px;
       overflow: hidden;
     }
 
@@ -313,7 +331,7 @@
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-      border-radius: 8px;
+      border-radius: 10px;
       transition: width 0.4s ease;
     }
 
@@ -327,34 +345,34 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      background: linear-gradient(135deg, rgba(25, 15, 40, 0.8), rgba(15, 9, 25, 0.8));
-      padding: 12px 16px;
-      border-radius: 14px;
-      border: 1px solid var(--border-color);
+      background: var(--snap-card-bg);
+      padding: 14px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
       transition: all 0.2s ease;
     }
 
     .checklist-item.done {
-      background: rgba(15, 23, 42, 0.4);
-      border-color: rgba(255, 255, 255, 0.08);
-      opacity: 0.6;
+      opacity: 0.5;
+      background: rgba(15, 10, 25, 0.4);
     }
 
     .checklist-item.done .checklist-text {
       text-decoration: line-through;
-      color: #94a3b8;
+      color: var(--subtext-color);
     }
 
     .custom-checkbox {
       appearance: none;
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       border: 2px solid var(--primary-color);
-      border-radius: 6px;
+      border-radius: 8px;
       outline: none;
       cursor: pointer;
       position: relative;
       flex-shrink: 0;
+      transition: all 0.2s;
     }
 
     .custom-checkbox:checked {
@@ -365,8 +383,8 @@
       content: '✓';
       position: absolute;
       color: #fff;
-      font-size: 12px;
-      font-weight: bold;
+      font-size: 13px;
+      font-weight: 800;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -374,27 +392,28 @@
 
     .checklist-text {
       flex: 1;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
+      font-weight: 500;
       color: #f1f5f9;
     }
 
-    /* ----------- Mobile-Optimized Chat Section ----------- */
+    /* ----------- SNAPCHAT-INSPIRED CHAT INTERFACE ----------- */
     .chat-container {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 18px;
+      background: var(--snap-card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
       display: flex;
       flex-direction: column;
-      height: 72vh;
-      max-height: 650px;
+      height: 75vh;
+      max-height: 680px;
       overflow: hidden;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
     }
 
     .chat-header {
-      padding: 10px 14px;
-      background: rgba(0, 0, 0, 0.5);
-      border-bottom: 1px solid var(--border-color);
+      padding: 12px 18px;
+      background: rgba(0, 0, 0, 0.35);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -403,43 +422,43 @@
     .chat-user-badge {
       display: flex;
       align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.04);
-      padding: 4px 10px;
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .chat-user-badge label {
-      font-size: 0.8rem;
-      color: var(--accent-color);
+      font-size: 0.78rem;
+      color: var(--subtext-color);
       font-weight: 600;
     }
 
     .chat-user-badge select {
       width: auto;
-      padding: 2px 6px;
+      padding: 2px 4px;
       font-size: 0.85rem;
-      font-weight: bold;
+      font-weight: 700;
       color: var(--primary-color);
-      background: #170e26;
-      border-radius: 6px;
+      background: transparent;
+      border: none;
     }
 
     .chat-messages {
       flex: 1;
-      padding: 12px;
+      padding: 14px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       scroll-behavior: smooth;
     }
 
     .chat-bubble-wrapper {
       display: flex;
       flex-direction: column;
-      max-width: 82%;
+      max-width: 80%;
       position: relative;
     }
 
@@ -454,10 +473,12 @@
     }
 
     .chat-author {
-      font-size: 0.72rem;
-      font-weight: 600;
-      margin-bottom: 2px;
-      padding: 0 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+      padding: 0 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .chat-bubble-wrapper.mine .chat-author { color: var(--accent-color); }
@@ -475,36 +496,38 @@
     }
 
     .chat-bubble {
-      padding: 9px 13px;
-      border-radius: 16px;
-      font-size: 0.9rem;
-      line-height: 1.35;
+      padding: 10px 15px;
+      border-radius: 20px;
+      font-size: 0.88rem;
+      line-height: 1.38;
       word-break: break-word;
       position: relative;
     }
 
+    /* Snap-Style Pill Bubbles */
     .chat-bubble-wrapper.mine .chat-bubble {
-      background: var(--chat-my-msg);
+      background: var(--snap-my-msg);
       color: #fff;
       border-bottom-right-radius: 4px;
-      box-shadow: 0 2px 10px rgba(255, 46, 147, 0.2);
+      box-shadow: 0 3px 12px rgba(255, 42, 141, 0.25);
     }
 
     .chat-bubble-wrapper.other .chat-bubble {
-      background: var(--chat-other-msg);
-      color: var(--text-color);
-      border: 1px solid var(--border-color);
+      background: var(--snap-other-msg);
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-bottom-left-radius: 4px;
     }
 
     .msg-actions {
       display: flex;
       gap: 2px;
-      opacity: 0.4;
+      opacity: 0.3;
       transition: opacity 0.2s;
     }
 
-    .chat-bubble-wrapper:hover .msg-actions {
+    .chat-bubble-wrapper:hover .msg-actions,
+    .chat-bubble-wrapper:active .msg-actions {
       opacity: 1;
     }
 
@@ -522,24 +545,19 @@
       font-size: 0.72rem;
     }
 
-    .msg-action-btn:hover {
-      background: var(--primary-color);
-      color: #fff;
-    }
-
     .emoji-picker-popup {
       display: none;
       position: absolute;
       bottom: 100%;
       z-index: 10;
-      background: rgba(23, 14, 38, 0.95);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 4px 8px;
-      gap: 6px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      margin-bottom: 4px;
+      background: rgba(18, 11, 28, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 4px 10px;
+      gap: 8px;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+      margin-bottom: 6px;
     }
 
     .chat-bubble-wrapper.mine .emoji-picker-popup { right: 0; }
@@ -547,16 +565,16 @@
 
     .emoji-picker-popup span {
       cursor: pointer;
-      font-size: 1.1rem;
-      transition: transform 0.2s;
+      font-size: 1.15rem;
+      transition: transform 0.15s;
     }
 
-    .emoji-picker-popup span:hover { transform: scale(1.25); }
+    .emoji-picker-popup span:active { transform: scale(1.3); }
 
     .msg-reactions {
       display: flex;
       gap: 3px;
-      margin-top: -6px;
+      margin-top: -5px;
       z-index: 2;
     }
 
@@ -564,38 +582,37 @@
     .chat-bubble-wrapper.other .msg-reactions { margin-left: 8px; }
 
     .reaction-badge {
-      background: rgba(13, 7, 20, 0.9);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 1px 5px;
+      background: rgba(11, 7, 18, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 1px 6px;
       font-size: 0.72rem;
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 3px;
       cursor: pointer;
     }
 
     .chat-time {
-      font-size: 0.65rem;
-      opacity: 0.7;
-      margin-top: 3px;
+      font-size: 0.62rem;
+      opacity: 0.75;
+      margin-top: 4px;
       display: block;
       text-align: right;
     }
 
     audio {
-      max-width: 200px;
-      height: 36px;
+      max-width: 210px;
+      height: 38px;
       margin-top: 4px;
-      outline: none;
+      border-radius: 20px;
     }
 
     .typing-indicator {
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: var(--accent-color);
-      font-style: italic;
-      padding: 3px 14px;
-      min-height: 20px;
+      padding: 2px 18px;
+      min-height: 18px;
       display: flex;
       align-items: center;
       gap: 4px;
@@ -607,22 +624,23 @@
       height: 4px;
       background-color: var(--accent-color);
       border-radius: 50%;
-      animation: typing 1.4s infinite ease-in-out;
+      animation: snapTyping 1.4s infinite ease-in-out;
     }
 
     .typing-dots span:nth-child(1) { animation-delay: 0s; }
     .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
     .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
 
-    @keyframes typing {
+    @keyframes snapTyping {
       0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
       40% { transform: scale(1); opacity: 1; }
     }
 
+    /* Snap Pill-shaped Input Bar */
     .chat-input-area {
-      padding: 10px;
-      background: rgba(0, 0, 0, 0.5);
-      border-top: 1px solid var(--border-color);
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
       display: flex;
       gap: 8px;
       align-items: center;
@@ -630,15 +648,17 @@
 
     .chat-input-area textarea {
       resize: none;
-      height: 40px;
-      border-radius: 20px;
-      padding: 9px 14px;
-      font-size: 0.9rem;
+      height: 42px;
+      border-radius: 22px;
+      padding: 10px 16px;
+      font-size: 0.88rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .chat-btn-icon {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       border: none;
       color: #fff;
@@ -648,12 +668,14 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      transition: transform 0.2s, background 0.3s;
+      transition: transform 0.15s ease;
     }
 
+    .chat-btn-icon:active { transform: scale(0.9); }
+
     .vocal-btn {
-      background: rgba(0, 242, 254, 0.15);
-      border: 1px solid var(--accent-color);
+      background: rgba(0, 242, 254, 0.12);
+      border: 1px solid rgba(0, 242, 254, 0.3);
       color: var(--accent-color);
     }
 
@@ -664,19 +686,19 @@
       animation: pulse 1s infinite;
     }
 
-    .send-btn {
-      background: var(--primary-color);
-      box-shadow: 0 0 10px rgba(255, 46, 147, 0.4);
-    }
-
     @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-      100% { transform: scale(1); }
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
+      70% { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
+    .send-btn {
+      background: var(--snap-my-msg);
+      box-shadow: 0 4px 12px rgba(255, 42, 141, 0.35);
+    }
+
+    @keyframes snapFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
@@ -688,17 +710,15 @@
     <div class="login-box">
       <h2>SOULEFED & MEDOUD ✨</h2>
       <p>Entrez le mot de passe pour accéder à votre espace privé</p>
-      <div class="input-group">
-        <input type="password" id="pass-input" placeholder="Mot de passe...">
-      </div>
-      <button class="btn" onclick="checkPassword()" style="margin-top: 12px;">Connexion 🔓</button>
+      <input type="password" id="pass-input" placeholder="Mot de passe...">
+      <button class="btn" onclick="checkPassword()" style="margin-top: 14px;">Connexion 🔓</button>
       <div id="error-msg" class="error-msg">Mot de passe incorrect!</div>
     </div>
   </div>
 
   <header>
     <div class="logo">SOULEFED & MEDOUD ❤️</div>
-    <button class="btn" style="width: auto; padding: 6px 12px; font-size: 0.8rem;" onclick="logout()">Déconnexion 🔒</button>
+    <button class="btn" style="width: auto; padding: 6px 14px; font-size: 0.78rem; border-radius: 16px;" onclick="logout()">🔒 Déconnexion</button>
   </header>
 
   <div class="nav-tabs">
@@ -712,13 +732,13 @@
     <!-- Souvenirs -->
     <div id="memories-tab" class="tab-content active">
       <div class="add-form">
-        <h3>✨ Ajouter un nouveau souvenir</h3>
+        <h3>✨ Ajouter un souvenir</h3>
         <div class="form-grid">
           <input type="text" id="mem-title" placeholder="Titre du souvenir...">
           <input type="date" id="mem-date">
         </div>
         <textarea id="mem-desc" rows="3" placeholder="Racontez ce moment spécial..."></textarea>
-        <button class="btn" style="margin-top: 12px;" onclick="addMemory()">Enregistrer le souvenir 💾</button>
+        <button class="btn" style="margin-top: 12px;" onclick="addMemory()">Enregistrer 💾</button>
       </div>
       <div id="memories-grid" class="grid-cards"></div>
     </div>
@@ -726,28 +746,28 @@
     <!-- Photos -->
     <div id="gallery-tab" class="tab-content">
       <div class="add-form">
-        <h3>📷 Ajouter une photo depuis votre appareil</h3>
+        <h3>📷 Ajouter une photo</h3>
         <div class="form-grid">
           <input type="file" id="img-file" accept="image/*">
-          <input type="text" id="img-caption" placeholder="Description de la photo...">
+          <input type="text" id="img-caption" placeholder="Légende...">
         </div>
         <button class="btn" onclick="uploadImage()">Importer la Photo 📷</button>
       </div>
       <div id="gallery-grid" class="grid-cards"></div>
     </div>
 
-    <!-- Messages / Chat style Instagram & Vocal -->
+    <!-- Messages / Snap-Style Chat -->
     <div id="notes-tab" class="tab-content">
       <div class="chat-container">
         <div class="chat-header">
           <div class="chat-user-badge">
-            <label for="current-user">Mon profil :</label>
+            <label for="current-user">Profil :</label>
             <select id="current-user" onchange="onUserChange()">
               <option value="Mohamed">Mohamed ♂️</option>
               <option value="Soulefed">Soulefed ♀️</option>
             </select>
           </div>
-          <span style="font-size: 0.8rem; color: var(--accent-color); font-weight: bold;">En direct ✨</span>
+          <span style="font-size: 0.75rem; color: var(--accent-color); font-weight: 700;">En direct ✨</span>
         </div>
 
         <div id="chat-messages" class="chat-messages" onclick="closeAllEmojiPickers(event)"></div>
@@ -755,8 +775,8 @@
         <div id="typing-status" class="typing-indicator"></div>
 
         <div class="chat-input-area">
-          <button id="vocal-btn" class="chat-btn-icon vocal-btn" onclick="toggleRecording()" title="Enregistrer un vocal">🎙️</button>
-          <textarea id="chat-input" placeholder="Écrivez un message..." oninput="handleTyping()" onkeydown="handleKeyDown(event)"></textarea>
+          <button id="vocal-btn" class="chat-btn-icon vocal-btn" onclick="toggleRecording()" title="Vocal">🎙️</button>
+          <textarea id="chat-input" placeholder="Envoyer un message..." oninput="handleTyping()" onkeydown="handleKeyDown(event)"></textarea>
           <button class="chat-btn-icon send-btn" onclick="sendChatMessage()">➔</button>
         </div>
       </div>
@@ -765,17 +785,16 @@
     <!-- Objectifs -->
     <div id="bucket-tab" class="tab-content">
       <div class="add-form">
-        <h3>🎯 Ajouter un objectif commun</h3>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <input type="text" id="bucket-text" placeholder="Chose à faire ensemble..." style="flex: 1; min-width: 180px;">
-          <button class="btn" style="width: auto; padding: 0 20px;" onclick="addBucket()">Ajouter ✨</button>
+        <h3>🎯 Ajouter un objectif</h3>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="bucket-text" placeholder="Objectif commun..." style="flex: 1;">
+          <button class="btn" style="width: auto; padding: 0 18px;" onclick="addBucket()">Ajouter ✨</button>
         </div>
       </div>
 
-      <!-- Barre de progression pour les objectifs -->
       <div class="progress-box">
         <div class="progress-text">
-          <span>Progression des objectifs</span>
+          <span>Progression</span>
           <span id="progress-percent">0%</span>
         </div>
         <div class="progress-bar-bg">
@@ -805,9 +824,10 @@
     const SECRET_PASS = "SOULEFED&MEDOUD";
     let typingTimeout = null;
 
-    let mediaRecorder;
+    let mediaRecorder = null;
     let audioChunks = [];
     let isRecording = false;
+    let audioStream = null;
 
     window.onload = function() {
       if (localStorage.getItem('isLoggedIn') === 'true') {
@@ -889,7 +909,7 @@
 
         if (isOtherTyping) {
           typingIndicator.innerHTML = `
-            <span>${typingUser} est en train d'écrire</span>
+            <span>${typingUser} écrit</span>
             <div class="typing-dots"><span></span><span></span><span></span></div>
           `;
         } else {
@@ -903,7 +923,7 @@
       });
     }
 
-    /* Souvenirs Redesigned */
+    /* Souvenirs */
     function addMemory() {
       const title = document.getElementById('mem-title').value.trim();
       const date = document.getElementById('mem-date').value;
@@ -921,7 +941,7 @@
       const grid = document.getElementById('memories-grid');
       
       if (items.length === 0) {
-        grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 30px;">Aucun souvenir enregistré pour le moment... ✨</p>`;
+        grid.innerHTML = `<p style="text-align: center; color: var(--subtext-color); padding: 30px;">Aucun souvenir enregistré... ✨</p>`;
         return;
       }
 
@@ -965,7 +985,7 @@
       `).join('');
     }
 
-    /* Messages / Chat & Vocal & Emoji & Delete */
+    /* Messages / Snap Chat */
     function handleTyping() {
       const currentUser = document.getElementById('current-user').value;
       db.ref(`typing/${currentUser}`).set(true);
@@ -1005,35 +1025,45 @@
       input.value = '';
     }
 
+    /* FIXED & IMPROVED VOCAL RECORDING FOR ALL BROWSERS & PHONES */
     async function toggleRecording() {
       const btn = document.getElementById('vocal-btn');
 
       if (!isRecording) {
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert("Votre navigateur ne prend pas en charge l'enregistrement vocal.");
+            return;
+          }
+
+          audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
           
           let options = {};
-          if (MediaRecorder.isTypeSupported('audio/mp4')) {
-            options = { mimeType: 'audio/mp4' };
-          } else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+          if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
             options = { mimeType: 'audio/webm;codecs=opus' };
+          } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+            options = { mimeType: 'audio/mp4' };
+          } else if (MediaRecorder.isTypeSupported('audio/aac')) {
+            options = { mimeType: 'audio/aac' };
           } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
             options = { mimeType: 'audio/ogg;codecs=opus' };
           }
 
-          mediaRecorder = new MediaRecorder(stream, options);
+          mediaRecorder = new MediaRecorder(audioStream, options);
           audioChunks = [];
 
           mediaRecorder.ondataavailable = event => {
-            if (event.data.size > 0) {
+            if (event.data && event.data.size > 0) {
               audioChunks.push(event.data);
             }
           };
 
-          mediaRecorder.onstop = async () => {
-            const mimeType = mediaRecorder.mimeType || 'audio/mp4';
+          mediaRecorder.onstop = () => {
+            const mimeType = mediaRecorder.mimeType || 'audio/webm';
             const audioBlob = new Blob(audioChunks, { type: mimeType });
             
+            if (audioBlob.size === 0) return;
+
             const reader = new FileReader();
             reader.readAsDataURL(audioBlob);
             reader.onloadend = () => {
@@ -1050,17 +1080,23 @@
                 timestamp: firebase.database.ServerValue.TIMESTAMP
               });
             };
+
+            if (audioStream) {
+              audioStream.getTracks().forEach(track => track.stop());
+            }
           };
 
-          mediaRecorder.start();
+          mediaRecorder.start(100);
           isRecording = true;
           btn.classList.add('recording');
           btn.innerText = '⏹️';
         } catch (err) {
-          alert("Impossible d'accéder au micro : " + err.message);
+          alert("Impossible d'accéder au micro : " + (err.message || err.name));
         }
       } else {
-        mediaRecorder.stop();
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
         isRecording = false;
         btn.classList.remove('recording');
         btn.innerText = '🎙️';
@@ -1073,9 +1109,7 @@
       if (popup) {
         const isVisible = popup.style.display === 'flex';
         closeAllEmojiPickers();
-        if (!isVisible) {
-          popup.style.display = 'flex';
-        }
+        if (!isVisible) popup.style.display = 'flex';
       }
     }
 
@@ -1095,7 +1129,7 @@
     }
 
     function deleteChatMessage(msgId) {
-      if (confirm('Voulez-vous vraiment supprimer ce message ?')) {
+      if (confirm('Supprimer ce message ?')) {
         db.ref(`notes/${msgId}`).remove();
       }
     }
@@ -1108,7 +1142,7 @@
 
       chatContainer.innerHTML = items.map(item => {
         const isMine = item.sender === currentUser;
-        const authorLabel = isMine ? `${item.sender} (Vous)` : item.sender;
+        const authorLabel = isMine ? `${item.sender}` : item.sender;
 
         let content = '';
         if (item.type === 'audio' || item.audio) {
@@ -1146,8 +1180,8 @@
                 <span class="chat-time">${item.time || ''}</span>
               </div>
               <div class="msg-actions">
-                <button class="msg-action-btn" title="Réagir" onclick="toggleEmojiPicker('${item.id}', event)">😊</button>
-                <button class="msg-action-btn" title="Supprimer" onclick="deleteChatMessage('${item.id}')">🗑️</button>
+                <button class="msg-action-btn" onclick="toggleEmojiPicker('${item.id}', event)">😊</button>
+                <button class="msg-action-btn" onclick="deleteChatMessage('${item.id}')">🗑️</button>
               </div>
               <div id="emoji-picker-${item.id}" class="emoji-picker-popup">
                 <span onclick="addReaction('${item.id}', '❤️')">❤️</span>
@@ -1179,7 +1213,7 @@
       return div.innerHTML;
     }
 
-    /* Objectifs Redesigned */
+    /* Objectifs */
     function addBucket() {
       const text = document.getElementById('bucket-text').value.trim();
       if (!text) return;
@@ -1202,7 +1236,7 @@
       document.getElementById('progress-bar-fill').style.width = `${percent}%`;
 
       if (total === 0) {
-        list.innerHTML = `<p style="text-align: center; color: #64748b; padding: 20px;">Aucun objectif pour le moment... Ajoutez-en un ! 🎯</p>`;
+        list.innerHTML = `<p style="text-align: center; color: var(--subtext-color); padding: 20px;">Aucun objectif... 🎯</p>`;
         return;
       }
 
@@ -1210,7 +1244,7 @@
         <div class="checklist-item ${item.done ? 'done' : ''}">
           <input type="checkbox" class="custom-checkbox" ${item.done ? 'checked' : ''} onchange="toggleBucket('${item.id}', ${item.done})">
           <span class="checklist-text">${escapeHtml(item.text)}</span>
-          <button class="delete-btn" style="position:static;" title="Supprimer" onclick="deleteItem('bucket', '${item.id}')">✕</button>
+          <button class="delete-btn" style="position:static;" onclick="deleteItem('bucket', '${item.id}')">✕</button>
         </div>
       `).join('');
     }
