@@ -8,6 +8,7 @@
   <!-- Firebase SDKs (Compat v9) -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"></script>
 
   <style>
     :root {
@@ -146,6 +147,22 @@
       background: linear-gradient(45deg, #ff2a8d, #00f2fe);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+    }
+
+    .header-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .notif-btn-head {
+      background: rgba(0, 242, 254, 0.12);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      color: var(--accent-color);
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
     }
 
     /* Snap-Style Bottom Navigation Tabs */
@@ -718,7 +735,10 @@
 
   <header>
     <div class="logo">SOULEFED & MEDOUD ❤️</div>
-    <button class="btn" style="width: auto; padding: 6px 14px; font-size: 0.78rem; border-radius: 16px;" onclick="logout()">🔒 Déconnexion</button>
+    <div class="header-btns">
+      <button class="notif-btn-head" onclick="enableNotifications()">🔔 Notifications</button>
+      <button class="btn" style="width: auto; padding: 6px 14px; font-size: 0.78rem; border-radius: 16px;" onclick="logout()">🔒 Déconnexion</button>
+    </div>
   </header>
 
   <div class="nav-tabs">
@@ -876,6 +896,19 @@
       listenToData();
     }
 
+    async function enableNotifications() {
+      if (!('Notification' in window)) {
+        alert("Votre navigateur ne prend pas en charge les notifications.");
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        alert("Notifications activées avec succès! 🔔");
+      } else {
+        alert("Veuillez autoriser les notifications dans les paramètres du navigateur.");
+      }
+    }
+
     function listenToData() {
       db.ref('memories').on('value', snapshot => {
         const data = snapshot.val() || {};
@@ -1025,7 +1058,7 @@
       input.value = '';
     }
 
-    /* FIXED & IMPROVED VOCAL RECORDING FOR ALL BROWSERS & PHONES */
+    /* VOCAL RECORDING FOR ALL BROWSERS & PHONES */
     async function toggleRecording() {
       const btn = document.getElementById('vocal-btn');
 
@@ -1045,8 +1078,6 @@
             options = { mimeType: 'audio/mp4' };
           } else if (MediaRecorder.isTypeSupported('audio/aac')) {
             options = { mimeType: 'audio/aac' };
-          } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
-            options = { mimeType: 'audio/ogg;codecs=opus' };
           }
 
           mediaRecorder = new MediaRecorder(audioStream, options);
@@ -1123,76 +1154,52 @@
       closeAllEmojiPickers();
     }
 
-    function removeReaction(msgId) {
-      const currentUser = document.getElementById('current-user').value;
-      db.ref(`notes/${msgId}/reactions/${currentUser}`).remove();
-    }
-
-    function deleteChatMessage(msgId) {
-      if (confirm('Supprimer ce message ?')) {
-        db.ref(`notes/${msgId}`).remove();
-      }
-    }
-
     function renderChatMessages(items) {
+      const container = document.getElementById('chat-messages');
       const currentUser = document.getElementById('current-user').value;
-      const chatContainer = document.getElementById('chat-messages');
 
       items.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
-      chatContainer.innerHTML = items.map(item => {
-        const isMine = item.sender === currentUser;
-        const authorLabel = isMine ? `${item.sender}` : item.sender;
-
-        let content = '';
-        if (item.type === 'audio' || item.audio) {
-          content = `<audio controls src="${item.audio}"></audio>`;
-        } else {
-          content = escapeHtml(item.text || '');
-        }
-
-        const reactions = item.reactions || {};
-        let reactionsHtml = '';
-        const reactionCounts = {};
-
-        Object.entries(reactions).forEach(([user, emoji]) => {
-          reactionCounts[emoji] = (reactionCounts[emoji] || 0) + 1;
-        });
-
-        if (Object.keys(reactionCounts).length > 0) {
-          reactionsHtml = `<div class="msg-reactions">`;
-          Object.entries(reactionCounts).forEach(([emoji, count]) => {
-            reactionsHtml += `
-              <div class="reaction-badge" onclick="removeReaction('${item.id}')">
-                <span>${emoji}</span> ${count > 1 ? `<span style="font-size:0.65rem;">${count}</span>` : ''}
-              </div>
-            `;
-          });
-          reactionsHtml += `</div>`;
-        }
+      container.innerHTML = items.map(msg => {
+        const isMine = msg.sender === currentUser;
+        const reactions = msg.reactions || {};
+        const reactionEntries = Object.entries(reactions);
 
         return `
           <div class="chat-bubble-wrapper ${isMine ? 'mine' : 'other'}">
-            <span class="chat-author">${authorLabel}</span>
-            <div class="bubble-row">
-              <div class="chat-bubble">
-                ${content}
-                <span class="chat-time">${item.time || ''}</span>
+            <span class="chat-author">${escapeHtml(msg.sender)}</span>
+            
+            <div style="position: relative; width: 100%;">
+              <div class="emoji-picker-popup" id="emoji-picker-${msg.id}">
+                <span onclick="addReaction('${msg.id}', '❤️')">❤️</span>
+                <span onclick="addReaction('${msg.id}', '🔥')">🔥</span>
+                <span onclick="addReaction('${msg.id}', '😂')">😂</span>
+                <span onclick="addReaction('${msg.id}', '😮')">😮</span>
+                <span onclick="addReaction('${msg.id}', '👍')">👍</span>
               </div>
-              <div class="msg-actions">
-                <button class="msg-action-btn" onclick="toggleEmojiPicker('${item.id}', event)">😊</button>
-                <button class="msg-action-btn" onclick="deleteChatMessage('${item.id}')">🗑️</button>
-              </div>
-              <div id="emoji-picker-${item.id}" class="emoji-picker-popup">
-                <span onclick="addReaction('${item.id}', '❤️')">❤️</span>
-                <span onclick="addReaction('${item.id}', '😂')">😂</span>
-                <span onclick="addReaction('${item.id}', '😮')">😮</span>
-                <span onclick="addReaction('${item.id}', '😢')">😢</span>
-                <span onclick="addReaction('${item.id}', '👍')">👍</span>
-                <span onclick="addReaction('${item.id}', '🔥')">🔥</span>
+
+              <div class="bubble-row">
+                <div class="chat-bubble">
+                  ${msg.type === 'audio' 
+                    ? `<audio controls src="${msg.audio}"></audio>` 
+                    : escapeHtml(msg.text)}
+                  <span class="chat-time">${msg.time || ''}</span>
+                </div>
+
+                <div class="msg-actions">
+                  <button class="msg-action-btn" onclick="toggleEmojiPicker('${msg.id}', event)">😊</button>
+                  <button class="msg-action-btn" onclick="deleteItem('notes', '${msg.id}')">✕</button>
+                </div>
               </div>
             </div>
-            ${reactionsHtml}
+
+            ${reactionEntries.length > 0 ? `
+              <div class="msg-reactions">
+                ${reactionEntries.map(([user, emoji]) => `
+                  <div class="reaction-badge" title="${user}">${emoji}</div>
+                `).join('')}
+              </div>
+            ` : ''}
           </div>
         `;
       }).join('');
@@ -1201,25 +1208,19 @@
     }
 
     function scrollToBottom() {
-      const chatContainer = document.getElementById('chat-messages');
-      setTimeout(() => {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      }, 50);
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.innerText = text;
-      return div.innerHTML;
+      const container = document.getElementById('chat-messages');
+      container.scrollTop = container.scrollHeight;
     }
 
     /* Objectifs */
     function addBucket() {
-      const text = document.getElementById('bucket-text').value.trim();
+      const input = document.getElementById('bucket-text');
+      const text = input.value.trim();
+
       if (!text) return;
 
-      db.ref('bucket').push({ text, done: false });
-      document.getElementById('bucket-text').value = '';
+      db.ref('bucket').push({ text: text, done: false });
+      input.value = '';
     }
 
     function toggleBucket(id, currentStatus) {
@@ -1228,29 +1229,40 @@
 
     function renderBucket(items) {
       const list = document.getElementById('bucket-list');
-      const total = items.length;
-      const completed = items.filter(i => i.done).length;
-      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+      const fill = document.getElementById('progress-bar-fill');
+      const percentText = document.getElementById('progress-percent');
 
-      document.getElementById('progress-percent').innerText = `${percent}% (${completed}/${total})`;
-      document.getElementById('progress-bar-fill').style.width = `${percent}%`;
-
-      if (total === 0) {
-        list.innerHTML = `<p style="text-align: center; color: var(--subtext-color); padding: 20px;">Aucun objectif... 🎯</p>`;
+      if (items.length === 0) {
+        list.innerHTML = `<p style="text-align: center; color: var(--subtext-color); padding: 20px;">Aucun objectif pour le moment... 🎯</p>`;
+        fill.style.width = '0%';
+        percentText.innerText = '0%';
         return;
       }
 
+      const completedCount = items.filter(i => i.done).length;
+      const percentage = Math.round((completedCount / items.length) * 100);
+
+      fill.style.width = percentage + '%';
+      percentText.innerText = percentage + '%';
+
       list.innerHTML = items.map(item => `
         <div class="checklist-item ${item.done ? 'done' : ''}">
-          <input type="checkbox" class="custom-checkbox" ${item.done ? 'checked' : ''} onchange="toggleBucket('${item.id}', ${item.done})">
+          <input type="checkbox" class="custom-checkbox" ${item.done ? 'checked' : ''} onclick="toggleBucket('${item.id}', ${item.done})">
           <span class="checklist-text">${escapeHtml(item.text)}</span>
-          <button class="delete-btn" style="position:static;" onclick="deleteItem('bucket', '${item.id}')">✕</button>
+          <button class="delete-btn" style="position: static;" onclick="deleteItem('bucket', '${item.id}')">✕</button>
         </div>
       `).join('');
     }
 
     function deleteItem(path, id) {
-      db.ref(`${path}/${id}`).remove();
+      if (confirm('Voulez-vous vraiment supprimer cet élément ?')) {
+        db.ref(`${path}/${id}`).remove();
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
   </script>
 </body>
